@@ -12,6 +12,8 @@ const SERVER_PORT = process.env.SERVER_PORT
   ? Number(process.env.SERVER_PORT)
   : 1337;
 
+const SESSION_SECRET = process.env.SESSION_SECRET || "mySessionSecretCatDog";
+
 export const config = {
   mongo: {
     url: MONGO_URL,
@@ -19,5 +21,8 @@ export const config = {
   server: {
     port: SERVER_PORT,
     dev: development,
+  },
+  sessions: {
+    secret: SESSION_SECRET,
   },
 };

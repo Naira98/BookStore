@@ -7,6 +7,7 @@ export interface IUser {
   phone: number;
   wallet: number;
   picture: string;
+  type: string;
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -38,6 +39,11 @@ const userSchema: Schema = new Schema(
     picture: {
       type: String,
       default: "profile/default-profile.jpg",
+    },
+    type: {
+      type: String,
+      enum: ["user", "admin", "superAdmin"],
+      default: "user",
     },
   },
   { timestamps: true }
