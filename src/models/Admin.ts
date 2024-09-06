@@ -11,7 +11,7 @@ export interface IAdmin {
 
 export interface IAdminModel extends IAdmin, Document {}
 
-const adminSchmea = new Schema(
+const adminSchmea: Schema = new Schema(
   {
     fullName: {
       type: String,

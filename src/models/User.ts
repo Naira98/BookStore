@@ -11,7 +11,7 @@ export interface IUser {
 
 export interface IUserModel extends IUser, Document {}
 
-const userSchema = new Schema(
+const userSchema: Schema = new Schema(
   {
     fullName: {
       type: String,

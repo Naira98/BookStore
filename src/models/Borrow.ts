@@ -14,7 +14,7 @@ export interface IBorrow {
 
 export interface IBorrowModel extends IBorrow, Document {}
 
-const bookSchema = new Schema(
+const bookSchema: Schema = new Schema(
   {
     book: {
       type: Schema.Types.ObjectId,

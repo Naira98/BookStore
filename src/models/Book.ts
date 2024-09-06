@@ -13,7 +13,7 @@ export interface IBook {
 
 export interface IBookModel extends IBook, Document {}
 
-const bookSchema = new Schema(
+const bookSchema: Schema = new Schema(
   {
     title: {
       type: String,
