@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-// /admins/
+/* /admins */
 router.post("/addBook");
 router.post("/addCopies");
 router.post("/addAdmin");

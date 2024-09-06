@@ -9,7 +9,7 @@ import {
 } from "../controllers/users";
 const router = express.Router();
 
-// /users/
+/* /users */
 router.get("/", findAll);
 router.get("/:book", findBook);
 router.post("/addMoney", addMoney);
