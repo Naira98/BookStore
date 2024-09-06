@@ -57,7 +57,7 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.session.userId) {
       next();
     } else {
-      const user = await User.findById(req.session.userId);
+      const user = await User.findById(req.session.userId).select('-password');
       if (!user) next();
       req.user = user;
       next();
