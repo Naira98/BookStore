@@ -1,10 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
-// import { IBook } from "./Book";
-// import { IUser } from "./User";
+import { IBook } from "./Book";
+import { IUser } from "./User";
 
 export interface IBorrow {
-  book: mongoose.Types.ObjectId;
-  user: mongoose.Types.ObjectId;
+  book: mongoose.Types.ObjectId | IBook;
+  user: mongoose.Types.ObjectId | IUser;
   regularPrice: number;
   deposit: number;
   status: string;
