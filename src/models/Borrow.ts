@@ -1,10 +1,8 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
-import { IBookModel } from "./Book";
-import { IUserModel } from "./User";
 
 export interface IBorrow {
-  book: ObjectId | IBookModel;
-  user: ObjectId | IUserModel;
+  book: ObjectId;
+  user: ObjectId;
   regularPrice: number;
   deposit: number;
   status: string;
