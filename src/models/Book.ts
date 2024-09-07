@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface IBook {
   title: string;
@@ -11,7 +11,7 @@ export interface IBook {
   description: string;
 }
 
-export interface IBookModel extends IBook, Document {}
+export interface IBookModel extends IBook, Document<ObjectId> {}
 
 const bookSchema: Schema = new Schema(
   {

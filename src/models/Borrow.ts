@@ -1,10 +1,10 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { IBook } from "./Book";
-import { IUser } from "./User";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import { IBookModel } from "./Book";
+import { IUserModel } from "./User";
 
 export interface IBorrow {
-  book: mongoose.Types.ObjectId | IBook;
-  user: mongoose.Types.ObjectId | IUser;
+  book: ObjectId | IBookModel;
+  user: ObjectId | IUserModel;
   regularPrice: number;
   deposit: number;
   status: string;
@@ -12,9 +12,9 @@ export interface IBorrow {
   returnDate: Date;
 }
 
-export interface IBorrowModel extends IBorrow, Document {}
+export interface IBorrowModel extends IBorrow, Document<ObjectId> {}
 
-const bookSchema: Schema = new Schema(
+const borrowSchema: Schema = new Schema(
   {
     book: {
       type: Schema.Types.ObjectId,
@@ -38,4 +38,4 @@ const bookSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model<IBorrowModel>("Book", bookSchema);
+export default mongoose.model<IBorrowModel>("Borrow", borrowSchema);

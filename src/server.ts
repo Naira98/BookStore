@@ -54,6 +54,7 @@ app.use(
 
 app.use(async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // console.log(req.session)
     if (!req.session.userId) {
       next();
     } else {

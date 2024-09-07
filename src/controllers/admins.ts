@@ -39,7 +39,7 @@ export const addBook = async (
     return res.status(201).json(addedBook);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
 
@@ -62,7 +62,7 @@ export const addCopies = async (
     return res.status(200).json(book);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
 
@@ -81,7 +81,7 @@ export const updateBook = async (
     return res.status(200).json(updatedBook);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
 
@@ -108,6 +108,6 @@ export const addAdmin = async (
     return res.status(201).json(addedAdmin);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };

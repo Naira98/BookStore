@@ -7,14 +7,16 @@ import {
   returnBook,
   updateAccount,
 } from "../controllers/users";
+import { isAuth } from "../middlewares/is-Auth";
+import { isUser } from "../middlewares/is-User";
 const router = express.Router();
 
 /* /users */
-router.get("/", findAll);
-router.get("/:book", findBook);
-router.post("/addMoney", addMoney);
-router.post("/borrow", borrowBook);
-router.post("/return", returnBook);
-router.patch("/account", updateAccount);
+router.get("/", isAuth, findAll);
+router.get("/:bookId", isAuth, findBook);
+router.post("/addMoney", isAuth, isUser, addMoney);
+router.post("/borrow/:bookId", isAuth, isUser, borrowBook);
+router.patch("/return/:borrowId", isAuth, isUser, returnBook);
+router.patch("/account", isAuth, isUser, updateAccount);
 
 export default router;

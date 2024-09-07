@@ -25,7 +25,7 @@ export const postRegister = async (
     return res.status(201).json(addedUser);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
 export const postLogin = async (
@@ -49,7 +49,7 @@ export const postLogin = async (
     return res.status(200).json(req.session);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
 export const postLogout = (req: Request, res: Response, next: NextFunction) => {
@@ -60,9 +60,9 @@ export const postLogout = (req: Request, res: Response, next: NextFunction) => {
       }
     });
     res.clearCookie("connect.sid");
-    return res.status(200).json('Logged out successfully')
+    return res.status(200).json("Logged out successfully");
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: (error as Error).message });
+    return res.status(500).json(error);
   }
 };
