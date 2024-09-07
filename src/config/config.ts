@@ -14,6 +14,8 @@ const SERVER_PORT = process.env.SERVER_PORT
 
 const SESSION_SECRET = process.env.SESSION_SECRET || "mySessionSecretCatDog";
 
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
+
 export const config = {
   mongo: {
     url: MONGO_URL,
@@ -25,4 +27,7 @@ export const config = {
   sessions: {
     secret: SESSION_SECRET,
   },
+  stripe: {
+    secret: STRIPE_SECRET_KEY
+  }
 };
