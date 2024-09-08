@@ -12,7 +12,8 @@ const SERVER_PORT = process.env.SERVER_PORT
   ? Number(process.env.SERVER_PORT)
   : 1337;
 
-const SESSION_SECRET = process.env.SESSION_SECRET || "mySessionSecretCatDog";
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "secret";
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "secret";
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
 
@@ -24,10 +25,11 @@ export const config = {
     port: SERVER_PORT,
     dev: development,
   },
-  sessions: {
-    secret: SESSION_SECRET,
+  jwt: {
+    accessSecret: JWT_ACCESS_SECRET,
+    refreshSecret: JWT_REFRESH_SECRET,
   },
   stripe: {
-    secret: STRIPE_SECRET_KEY
-  }
+    secret: STRIPE_SECRET_KEY,
+  },
 };

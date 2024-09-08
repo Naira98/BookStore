@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import User from "../models/User";
-import { ObjectId } from "mongoose";
+import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
+import { config } from "../config/config";
+import { UserPayload } from "../schemas/authSchemas";
 
 export const postRegister = async (
   req: Request,
@@ -42,27 +45,42 @@ export const postLogin = async (
     const doMatch = await bcrypt.compare(password, user.password);
     if (!doMatch) return res.status(400).json({ message: "Bad Credentials" });
 
-    req.session.isAuth = true;
-    req.session.userId = user._id as ObjectId;
-    req.session.type = user.type;
+    const accessToken = generateAccessToken({
+      userId: user._id.toString(),
+      type: user.type,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user._id.toString(),
+      type: user.type,
+    });
 
-    return res.status(200).json(req.session);
+    return res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
   }
 };
-export const postLogout = (req: Request, res: Response, next: NextFunction) => {
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        throw new Error(err);
-      }
+    const { refreshToken } = req.body;
+    const user = jwt.verify(
+      refreshToken,
+      config.jwt.refreshSecret
+    ) as UserPayload;
+
+    const newAccessToken = generateAccessToken({
+      userId: user.userId,
+      type: user.type,
     });
-    res.clearCookie("connect.sid");
-    return res.status(200).json("Logged out successfully");
+
+    return res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
     console.log(error);
-    return res.status(500).json(error);
+    return res.status(401).json({ message: "You are not authenticated" });
   }
 };

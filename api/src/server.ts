@@ -31,43 +31,43 @@ app.use(
 
 declare module "express" {
   interface Request {
-    user?: IUserModel | null;
+    user?: { userId?: string; type?: string };
   }
 }
 
-declare module "express-session" {
-  interface SessionData {
-    userId: ObjectId;
-    isAuth: boolean;
-    type: string
-  }
-}
+// declare module "express-session" {
+//   interface SessionData {
+//     userId: ObjectId;
+//     isAuth: boolean;
+//     type: string;
+//   }
+// }
 
-app.use(
-  session({
-    secret: config.sessions.secret,
-    resave: false,
-    saveUninitialized: true,
-    store,
-  })
-);
+// app.use(
+//   session({
+//     secret: config.sessions.secret,
+//     resave: false,
+//     saveUninitialized: true,
+//     store,
+//   })
+// );
 
-app.use(async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // console.log(req.session)
-    if (!req.session.userId) {
-      next();
-    } else {
-      const user = await User.findById(req.session.userId).select('-password');
-      if (!user) next();
-      req.user = user;
-      next();
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
+// app.use(async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     // console.log(req.session)
+//     if (!req.session.userId) {
+//       next();
+//     } else {
+//       const user = await User.findById(req.session.userId).select("-password");
+//       if (!user) next();
+//       req.user = user;
+//       next();
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(error);
+//   }
+// });
 
 app.use("/auth", authRoutes);
 app.use("/admins", adminRoutes);
