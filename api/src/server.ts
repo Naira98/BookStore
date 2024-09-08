@@ -1,5 +1,5 @@
 import path from "path";
-import express from "express";
+import express, { Request } from "express";
 import mongoose from "mongoose";
 import config from "./config/config";
 import authRoutes from "./routes/auth";
@@ -8,16 +8,11 @@ import userRoutes from "./routes/users";
 
 const app = express();
 
+export const IMAGES_PATH = path.join(__dirname, "..", "public");
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(
-  "/books",
-  express.static(path.join(__dirname, "..", "public", "books"))
-);
-app.use(
-  "/profiles",
-  express.static(path.join(__dirname, "..", "public", "profiles"))
-);
+app.use("/assets", express.static(IMAGES_PATH));
 
 declare module "express" {
   interface Request {
@@ -26,7 +21,7 @@ declare module "express" {
 }
 
 app.use("/api/auth", authRoutes);
-app.use("api/admins", adminRoutes);
+app.use("/api/admins", adminRoutes);
 app.use("/api/users", userRoutes);
 
 mongoose

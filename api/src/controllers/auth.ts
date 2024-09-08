@@ -22,7 +22,7 @@ export const postRegister = async (
       email,
       password: hashedPassword,
       phone,
-      picture: picture ? picture : "profiles/default-profile.jpg",
+      picture: picture ? picture : "/assets/profiles/default-profile.jpg",
     });
     const addedUser = await newUser.save();
     return res.status(201).json(addedUser);

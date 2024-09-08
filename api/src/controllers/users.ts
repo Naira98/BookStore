@@ -51,6 +51,9 @@ export const borrowBook = async (
     const book = await Book.findById(bookId);
     if (!book) return res.status(404).json({ message: "Book not found" });
 
+    const user = await User.findById(req.user?.userId);
+    if (!user) return res.status(404).json({ message: "Book not found" });
+
     // check book availablitiy
     if (book.availableCopies <= 0)
       return res
@@ -59,7 +62,7 @@ export const borrowBook = async (
 
     // check user wallet
     const bookPrice = book.regularPrice + book.deposit;
-    if (req.user?.wallet && req.user?.wallet < bookPrice)
+    if (user.wallet && user.wallet < bookPrice)
       return res.status(400).json({
         message: `You need ${bookPrice}$ to borrow ${book.title} book`,
       });
@@ -70,7 +73,7 @@ export const borrowBook = async (
       // New borrow
       const newBorrow = new Borrow({
         book: book._id,
-        user: req.user?._id,
+        user: user._id,
         regularPrice: book.regularPrice,
         deposit: book.deposit,
         status: "borrowed",
@@ -79,7 +82,7 @@ export const borrowBook = async (
 
       // Pay money
       await User.findByIdAndUpdate(
-        req.user?._id,
+        user._id,
         { $inc: { wallet: -bookPrice } },
         { session }
       );
@@ -114,7 +117,7 @@ export const returnBook = async (
     if (borrow.status !== "borrowed")
       return res.status(400).json({ message: "Book not borrowed" });
 
-    if (borrow.user.toString() !== req.user?._id.toString())
+    if (borrow.user.toString() !== req.user?.userId)
       return res.status(403).json({ message: "Unauthorized" });
 
     /* Transaction */
@@ -167,7 +170,7 @@ export const updateAccount = async (
   next: NextFunction
 ) => {
   try {
-    const user = await User.findById(req.user?._id);
+    const user = await User.findById(req.user?.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     } else {
