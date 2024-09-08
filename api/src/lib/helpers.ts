@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { config } from "../config/config";
+import config from "../config/config";
 import { UserPayload } from "../schemas/authSchemas";
 
 export const generateAccessToken = (data: UserPayload) => {

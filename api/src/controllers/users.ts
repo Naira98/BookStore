@@ -6,7 +6,7 @@ import Stripe from "stripe";
 import Book from "../models/Book";
 import Borrow from "../models/Borrow";
 import User from "../models/User";
-import { config } from "../config/config";
+import config from "../config/config";
 
 const stripe = new Stripe(config.stripe.secret);
 
@@ -216,9 +216,7 @@ export const createCheckoutSession = async (
 };
 
 export const addMoney = (req: Request, res: Response, next: NextFunction) => {
-  try{
-    console.log(req)
-  } catch (err) {
-
-  }
-}
+  try {
+    console.log(req);
+  } catch (err) {}
+};

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
-import { config } from "../config/config";
+import config from "../config/config";
 import { UserPayload } from "../schemas/authSchemas";
 
 export const postRegister = async (

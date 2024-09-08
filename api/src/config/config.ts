@@ -17,7 +17,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "secret";
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";
 
-export const config = {
+const config = {
   mongo: {
     url: MONGO_URL,
   },
@@ -33,3 +33,5 @@ export const config = {
     secret: STRIPE_SECRET_KEY,
   },
 };
+
+export default config;

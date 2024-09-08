@@ -1,7 +1,7 @@
 import path from "path";
 import express from "express";
 import mongoose from "mongoose";
-import { config } from "./config/config";
+import config from "./config/config";
 import authRoutes from "./routes/auth";
 import adminRoutes from "./routes/admins";
 import userRoutes from "./routes/users";
