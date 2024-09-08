@@ -4,7 +4,7 @@ import { isAdmin } from "../middlewares/is-Admin";
 import { isSuperAdmin } from "../middlewares/is-Super-Admin";
 const router = express.Router();
 
-/* /admins */
+/* api//admins */
 router.post("/addBook", isAdmin, addBook);
 router.patch("/addCopies/:bookId", isAdmin, addCopies);
 router.patch("/book/:bookId", isAdmin, updateBook);

@@ -12,7 +12,7 @@ import { isAuth } from "../middlewares/is-Auth";
 import { isUser } from "../middlewares/is-User";
 const router = express.Router();
 
-/* /users */
+/* /api/users */
 router.get("/", isAuth, findAll);
 router.get("/create-checkout-session/:price", isAuth, isUser, createCheckoutSession);
 router.get('/addMoney', addMoney)

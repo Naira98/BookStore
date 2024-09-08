@@ -25,9 +25,9 @@ declare module "express" {
   }
 }
 
-app.use("/auth", authRoutes);
-app.use("/admins", adminRoutes);
-app.use("/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("api/admins", adminRoutes);
+app.use("/api/users", userRoutes);
 
 mongoose
   .connect(config.mongo.url, { retryWrites: true, w: "majority" })
