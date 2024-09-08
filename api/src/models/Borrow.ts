@@ -24,8 +24,16 @@ const borrowSchema: Schema = new Schema(
       ref: "User",
       required: true,
     },
-    regularPrice: { type: Number, required: true },
-    deposit: { type: Number, required: true },
+    regularPrice: {
+      type: Number,
+      required: true,
+      min: [0, "Regular Price must be a positive value"],
+    },
+    deposit: {
+      type: Number,
+      required: true,
+      min: [0, "Deposit must be a positive value"],
+    },
     status: { type: String, enum: ["borrowed", "returned"] },
     borrowingDate: { type: Date, default: new Date() },
     returnDate: {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import config from "../config/config";
-import { UserPayload } from "../schemas/authSchemas";
+import { UserPayload } from "../schemas/userSchemas";
 
 export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   let token = req.header("Authorization");
@@ -16,6 +16,6 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
     req.user = payload;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Token Invalid" });
+    return res.status(403).json({ message: "Invalid Access Token" });
   }
 };

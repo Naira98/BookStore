@@ -20,10 +20,26 @@ const bookSchema: Schema = new Schema(
       required: true,
       unique: true,
     },
-    copies: { type: Number, required: true },
-    availableCopies: { type: Number, required: true },
-    regularPrice: { type: Number, required: true },
-    deposit: { type: Number, required: true },
+    copies: {
+      type: Number,
+      required: true,
+      min: [0, "Copies must be a positive value"],
+    },
+    availableCopies: {
+      type: Number,
+      required: true,
+      min: [0, "Available copies must be a positive value"],
+    },
+    regularPrice: {
+      type: Number,
+      required: true,
+      min: [0, "Regular Price must be a positive value"],
+    },
+    deposit: {
+      type: Number,
+      required: true,
+      min: [0, "Deposit must be a positive value"],
+    },
     poster: {
       type: String,
       required: true,

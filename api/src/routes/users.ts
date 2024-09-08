@@ -6,11 +6,10 @@ import {
   findAll,
   findBook,
   returnBook,
-  updateAccount,
 } from "../controllers/users";
 import { isAuth } from "../middlewares/is-Auth";
 import { isUser } from "../middlewares/is-User";
-import { uploadProfile } from "../config/multer";
+
 const router = express.Router();
 
 /* /api/users */
@@ -30,13 +29,5 @@ router.get("/:bookId", isAuth, findBook);
 router.post("/borrow/:bookId", isAuth, isUser, borrowBook);
 
 router.patch("/return/:borrowId", isAuth, isUser, returnBook);
-
-router.patch(
-  "/account",
-  isAuth,
-  isUser,
-  uploadProfile.single("picture"),
-  updateAccount
-);
 
 export default router;

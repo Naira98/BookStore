@@ -22,7 +22,7 @@ const storageBook = multer.diskStorage({
   filename: (req, file, cb) => {
     const randomeName = nanoid() + path.extname(file.originalname);
     cb(null, randomeName);
-    req.body.picturePath = randomeName;
+    req.body.poster = randomeName;
   },
 });
 

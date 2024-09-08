@@ -1,10 +1,11 @@
+import { min } from "date-fns";
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface IUser {
   fullName: string;
   email: string;
   password: string;
-  phone: number;
+  phone: string;
   wallet: number;
   picture: string;
   type: string;
@@ -28,13 +29,14 @@ const userSchema: Schema = new Schema(
       required: true,
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
     wallet: {
       type: Number,
       default: 0,
+      min: [0, "Wallet can't be negative"],
     },
     picture: {
       type: String,
