@@ -2,18 +2,18 @@ import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <div className="min-w-full pl-4 pr-8 shadow-md font-bold">
+    <div className="min-w-full px-8 shadow-md font-bold">
       <div className="flex items-center justify-between mx-5">
         <Link to="/">
           <div className="flex items-center justify-center">
-            <img src="logo8.png" alt="logo" className="w-28 h-26" />
+            <img src="logo.png" alt="logo" className="w-28 h-26" />
             <h1 className="font-extrabold text-3xl text-orange-400 pl-3">
               Book Store
             </h1>
           </div>
         </Link>
 
-        <div className="space-x-5 flex items-center justify-center">
+        <div className="space-x-5 flex items-center justify-center mr-4">
           <Link
             to="/update-user"
             className="space-x-3 flex items-center justify-center"
