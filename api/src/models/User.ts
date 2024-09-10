@@ -1,4 +1,3 @@
-import { min } from "date-fns";
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface IUser {

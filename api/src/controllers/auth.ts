@@ -5,6 +5,7 @@ import User, { IUser } from "../models/User";
 import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
 import config from "../config/config";
 import { UserPayload } from "../schemas/userSchemas";
+import Token from "../models/Token";
 
 export const postRegister = async (
   req: Request,
@@ -60,6 +61,15 @@ export const postLogin = async (
       type: user.type,
     });
 
+    await Token.findOneAndDelete({ userId: user._id });
+
+    const newToken = new Token({
+      userId: user._id,
+      refreshToken,
+    });
+
+    const token = await newToken.save();
+
     return res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     console.log(error);
@@ -74,6 +84,10 @@ export const refreshToken = async (
 ) => {
   try {
     const { refreshToken } = req.body;
+
+    const tokenInDB = await Token.findOne({ refreshToken });
+    if (!tokenInDB) return res.status(401).json({ message: "Invlaid Token" });
+
     const user = jwt.verify(
       refreshToken,
       config.jwt.refreshSecret
@@ -103,6 +117,20 @@ export const updateAccount = async (
     user.set(req.body);
     const updatedUser = await user.save();
     return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+export const postLogout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await Token.findOneAndDelete({ userId: req.user?.userId });
+    return res.status(200).json({ message: "Logged Out!" });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
