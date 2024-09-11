@@ -46,11 +46,16 @@ export const postLogin = async (
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).select(
+      " -createdAt -updatedAt"
+    );
     if (!user) return res.status(400).json({ message: "Bad Credentials" });
+    console.log(user);
 
-    const doMatch = await bcrypt.compare(password, user.password);
+    const doMatch = await bcrypt.compare(password, user.password!);
     if (!doMatch) return res.status(400).json({ message: "Bad Credentials" });
+
+    delete user.password;
 
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
@@ -70,7 +75,9 @@ export const postLogin = async (
 
     const token = await newToken.save();
 
-    return res.status(200).json({ accessToken, refreshToken });
+    return res
+      .status(200)
+      .json({ user, tokens: { accessToken, refreshToken } });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);

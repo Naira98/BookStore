@@ -13,36 +13,22 @@ import AddAdmin from "./pages/AddAdmin";
 import UpdateBook from "./pages/UpdateBook";
 import UpdateUser from "./pages/UpdateUser";
 import IsAdmin from "./components/IsAdmin";
-import IsAuth from "./components/IsAuth";
-import ProtectedLogin from "./components/ProtectedLogin";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+
 
 function App() {
   return (
-    <div className="text-cyan-600 bg-amber-50 tracking-wide min-h-screen  ">
+    <div className="text-cyan-primary bg-amber-primary tracking-wide min-h-screen  ">
       <Routes>
         <Route
-          path="/register"
           element={
-            <ProtectedLogin>
-              <Register />
-            </ProtectedLogin>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <ProtectedLogin>
-              <Login />
-            </ProtectedLogin>
-          }
-        />
-        <Route
-          element={
-            <IsAuth>
+            <ProtectedRoutes>
               <AppLayout />
-            </IsAuth>
+            </ProtectedRoutes>
           }
         >
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact-us" element={<ContactUs />} />

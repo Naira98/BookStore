@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, ObjectId } from "mongoose";
 export interface IUser {
   fullName: string;
   email: string;
-  password: string;
+  password?: string;
   phone: string;
   wallet: number;
   picture: string;

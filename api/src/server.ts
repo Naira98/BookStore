@@ -1,6 +1,7 @@
 import path from "path";
-import express, { Request } from "express";
+import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import config from "./config/config";
 import authRoutes from "./routes/auth";
 import adminRoutes from "./routes/admins";
@@ -13,6 +14,7 @@ export const IMAGES_PATH = path.join(__dirname, "..", "public");
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/assets", express.static(IMAGES_PATH));
+app.use(cors());
 
 declare module "express" {
   interface Request {
