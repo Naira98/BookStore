@@ -13,11 +13,11 @@ export interface Tokens {
   refreshToken: string;
 }
 
-export interface State {
+export interface ReduxState {
   user: IUserModel | null;
-    isAuth: boolean;
+  isAuth: boolean;
 }
-const initialState: State = {
+const initialState: ReduxState = {
   user: null,
   isAuth: false,
 };

@@ -1,10 +1,12 @@
 import { Link, NavLink } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useSelector } from "react-redux";
-import { State as ReduxState } from "../redux/authSlice";
+import { ReduxState as ReduxState } from "../redux/authSlice";
+import { useLogout } from "../hooks/useLogout";
 
 const Navbar = () => {
   const isAuth = useSelector((state: ReduxState) => state.isAuth);
+  const { logout } = useLogout();
   return (
     <div className="min-w-full px-8 shadow-md font-bold">
       <div className="flex items-center justify-between mx-5">
@@ -49,7 +51,7 @@ const Navbar = () => {
             Contact Us
           </NavLink>
           {isAuth && (
-            <button className="btn">
+            <button className="btn" onClick={() => logout()}>
               <LogoutIcon /> Logout
             </button>
           )}

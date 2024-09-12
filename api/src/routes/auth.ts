@@ -3,6 +3,7 @@ import {
   postLogin,
   postRegister,
   refreshToken,
+  getUser,
   updateAccount,
   postLogout,
 } from "../controllers/auth";
@@ -28,6 +29,8 @@ router.post(
 router.post("/login", validateData(loginSchema), postLogin);
 
 router.post("/refresh", refreshToken);
+
+router.get("/user", isAuth,getUser);
 
 router.patch(
   "/account",

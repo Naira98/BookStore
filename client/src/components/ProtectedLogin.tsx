@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { ReduxState } from "../redux/authSlice";
 
-const ProtectedRoutes = ({ children }: { children: ReactElement }) => {
+const ProtectedLogin = ({ children }: { children: ReactElement }) => {
   const isAuth = useSelector((state: ReduxState) => state.isAuth);
 
-  if (!isAuth) return <Navigate to={"/login"} replace />;
+  if (isAuth) return <Navigate to="/" replace />;
 
   return children;
 };
 
-export default ProtectedRoutes;
+export default ProtectedLogin;

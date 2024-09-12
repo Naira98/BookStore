@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+import toast, { Toaster } from "react-hot-toast";
 import "./App.css";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -14,13 +15,28 @@ import UpdateBook from "./pages/UpdateBook";
 import UpdateUser from "./pages/UpdateUser";
 import IsAdmin from "./components/IsAdmin";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import { Toaster } from "react-hot-toast";
-
+import { useGetUser } from "./hooks/useGetUser";
+import ProtectedLogin from "./components/ProtectedLogin";
 
 function App() {
+  const { isPending, error } = useGetUser();
+
+  if (isPending) return <h1>Loading...</h1>;
+  if (error) toast.error(error.message);
+
   return (
-    <div className="text-cyan-primary bg-amber-primary tracking-wide min-h-screen  ">
+    <div className="text-cyan-primary bg-amber-primary tracking-wide min-h-screen">
       <Routes>
+        <Route
+          element={
+            <ProtectedLogin>
+              <AppLayout />
+            </ProtectedLogin>
+          }
+        >
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
         <Route
           element={
             <ProtectedRoutes>
@@ -28,8 +44,6 @@ function App() {
             </ProtectedRoutes>
           }
         >
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact-us" element={<ContactUs />} />
@@ -63,28 +77,28 @@ function App() {
         </Route>
       </Routes>
       <Toaster
-          position="top-center"
-          gutter={12}
-          containerStyle={{ margin: "8px" }}
-          toastOptions={{
-            // Define default options
-            style: {
-              fontSize: "15px",
-              padding: "16px 24px",
-              maxWidth: "500px",
-              background: "#fffef5",
-              color: "#fb923c",
-            },
+        position="top-center"
+        gutter={12}
+        containerStyle={{ margin: "8px" }}
+        toastOptions={{
+          // Define default options
+          style: {
+            fontSize: "15px",
+            padding: "16px 24px",
+            maxWidth: "500px",
+            background: "#fffef5",
+            color: "#fb923c",
+          },
 
-            // Default options for specific types
-            success: {
-              duration: 3000,
-            },
-            error: {
-              duration: 5000,
-            },
-          }}
-        />
+          // Default options for specific types
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 5000,
+          },
+        }}
+      />
     </div>
   );
 }
