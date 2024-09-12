@@ -16,8 +16,9 @@ export const useLogin = () => {
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       loginApi(email, password),
     onSuccess: (data) => {
+      console.log(data)
       // data: {user: {}, tokens: {}}
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.setQueryData(['user'], data.user);
       dispatch(setLogin(data.user));
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
       localStorage.setItem("accessToken", data.tokens.accessToken);

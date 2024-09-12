@@ -22,7 +22,11 @@ function App() {
   const { isPending, error } = useGetUser();
 
   if (isPending) return <h1>Loading...</h1>;
-  if (error) toast.error(error.message);
+  if (error) {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    toast.error(error.message);
+  }
 
   return (
     <div className="text-cyan-primary bg-amber-primary tracking-wide min-h-screen">

@@ -50,7 +50,6 @@ export const postLogin = async (
       " -createdAt -updatedAt"
     );
     if (!user) return res.status(400).json({ message: "Bad Credentials" });
-    console.log(user);
 
     const doMatch = await bcrypt.compare(password, user.password!);
     if (!doMatch) return res.status(400).json({ message: "Bad Credentials" });
@@ -65,15 +64,11 @@ export const postLogin = async (
       userId: user._id.toString(),
       type: user.type,
     });
-
-    await Token.findOneAndDelete({ userId: user._id });
-
-    const newToken = new Token({
-      userId: user._id,
-      refreshToken,
-    });
-
-    const token = await newToken.save();
+    await Token.findOneAndUpdate(
+      { userId: user._id },
+      { $set: { userId: user._id, refreshToken } },
+      { upsert: true }
+    );
 
     return res
       .status(200)
