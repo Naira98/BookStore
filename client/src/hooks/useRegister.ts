@@ -15,7 +15,7 @@ export const useRegister = () => {
   } = useMutation({
     mutationFn: (values: RegisterFormType) => registerApi(values),
     onSuccess: () => {
-      toast.success("You Registered Successfully");
+      toast.success("You registered successfully");
       navigate("/login");
     },
     onError: (err) => {

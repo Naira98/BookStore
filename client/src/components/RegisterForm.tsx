@@ -32,6 +32,7 @@ const RegisterForm = () => {
     lastName: yup.string().required("required"),
     email: yup.string().email().required("required"),
     password: yup.string().required("required"),
+    phone: yup.string().required("required"),
   });
 
   const initialValuesRegister: RegisterFormType = {
@@ -45,7 +46,6 @@ const RegisterForm = () => {
 
   const handleSubmit = (values: RegisterFormType) => {
     register(values);
-    console.log(values);
   };
 
   return (

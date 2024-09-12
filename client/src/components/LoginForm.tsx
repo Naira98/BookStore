@@ -8,75 +8,111 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  TextField,
 } from "@mui/material";
 import { useLogin } from "../hooks/useLogin";
+import { Formik } from "formik";
+import { RegisterFormType } from "./RegisterForm";
+import * as yup from 'yup'
+
+export type LoginFormType = Pick<RegisterFormType, "email" | "password">;
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const { login, isPending } = useLogin();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    login({ email, password });
+  const loginSchema = yup.object().shape({
+    email: yup.string().email().required("required"),
+    password: yup.string().required("required"),
+  });
+
+  const initialValuesLogin: LoginFormType = {
+    email: "",
+    password: "",
   };
+
+  const handleSubmit = (values: LoginFormType) => {
+    login(values);
+  };
+
   return (
     <div>
       <Box className="flex items-center justify-center py-8">
-        <form
+        <Formik
+          initialValues={initialValuesLogin}
+          validationSchema={loginSchema}
           onSubmit={handleSubmit}
-          className="flex flex-col justify-center items-center gap-6 py-10 px-6 border-2 border-solid border-cyan-secondary rounded-md shadow-md bg-amber-secondary"
         >
-          <h1 className="font-bold">Login to enjoy reading :)</h1>
+          {({
+            values,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            setFieldValue,
+          }) => (
+            <form
+              onSubmit={handleSubmit}
+              className="grid gap-6 py-5 px-10 border-2 border-solid border-cyan-secondary rounded-md shadow-md bg-amber-secondary"
+            >
+              <h1 className="text-xl font-bold text-center">
+                Register to enjoy reading :)
+              </h1>
 
-          <FormControl
-            color="info"
-            sx={{ m: 1, width: "25ch" }}
-            variant="outlined"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setEmail(e.target.value);
-            }}
-          >
-            <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
-            <OutlinedInput id="outlined-adornment-email" label="Email" />
-          </FormControl>
+              <TextField
+                id="outlined-basic"
+                label="Email"
+                variant="outlined"
+                color="info"
+                type="email"
+                name="email"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.email}
+              />
 
-          <FormControl
-            color="info"
-            sx={{ m: 1, width: "25ch" }}
-            variant="outlined"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-          >
-            <InputLabel htmlFor="outlined-adornment-password">
-              Password
-            </InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-password"
-              type={showPassword ? "text" : "password"}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword((show) => !show)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onMouseUp={(e) => e.preventDefault()}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
-              label="Password"
-            />
-          </FormControl>
-          <button className="btn" type="submit" disabled={isPending}>
-            Login
-          </button>
-        </form>
+              <FormControl
+                color="info"
+                variant="outlined"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFieldValue("password", e.target.value)
+                }
+              >
+                <InputLabel htmlFor="outlined-adornment-password">
+                  Password
+                </InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={showPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword((show) => !show)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onMouseUp={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Password"
+                />
+              </FormControl>
+
+              <div className="flex justify-center">
+                <button
+                  className="btn max-w-32"
+                  type="submit"
+                  disabled={isPending}
+                >
+                  Login
+                </button>
+              </div>
+            </form>
+          )}
+        </Formik>
       </Box>
       <h1 className="text-center">
         Don't have an account?{" "}
