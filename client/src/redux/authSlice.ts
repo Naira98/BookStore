@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface IUserModel {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   wallet: number;
   picture: string;

@@ -9,7 +9,7 @@ import userRoutes from "./routes/users";
 
 const app = express();
 
-export const IMAGES_PATH = path.join(__dirname, "..", "public");
+export const IMAGES_PATH = path.join(__dirname, "..", "public", "assets");
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

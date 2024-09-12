@@ -3,10 +3,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useSelector } from "react-redux";
 import { ReduxState as ReduxState } from "../redux/authSlice";
 import { useLogout } from "../hooks/useLogout";
+import ProfileImage from "./ProfileImage";
 
 const Navbar = () => {
-  const isAuth = useSelector((state: ReduxState) => state.isAuth);
+  const { user, isAuth } = useSelector((state: ReduxState) => state);
   const { logout } = useLogout();
+  console.log(user?.picture);
   return (
     <div className="min-w-full px-8 shadow-md font-bold">
       <div className="flex items-center justify-between mx-5">
@@ -26,12 +28,10 @@ const Navbar = () => {
               to="/update-user"
               className="space-x-3 flex items-center justify-center"
             >
-              <img
-                src="default-profile.jpg"
-                alt="profile picture"
-                className="rounded-full h-8 w-8"
-              />
-              <h1 className="hover:text-orange">User Name</h1>
+              <ProfileImage image={user!.picture} />
+              <h1 className="hover:text-orange">
+                {user ? user.firstName : "user"}
+              </h1>
             </Link>
           )}
           <NavLink

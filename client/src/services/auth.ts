@@ -65,7 +65,7 @@ export const getUserApi = async (
       );
       const data = await res.json();
       if (res.ok) {
-        dispatch(setLogin(data));
+        dispatch(setLogin(data.user));
         return data;
       } else {
         throw new Error(data.message);
