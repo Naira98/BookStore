@@ -14,3 +14,6 @@
 - Mongoose Transaction
 - Multer
 - Zod Validation
+- Yup Validation
+- Formik
+- Material ui
