@@ -9,7 +9,7 @@ export default {
         darkBlue: "#272343",
         orange: "#fb923c",
         cyan: { primary: "#0891b2", secondary: "#06b6d4" },
-        gray: "#f3f4f6",
+        gray: { primary: "#666662", secondary: "#c4c3bc" },
         amber: { primary: "#fffbeb", secondary: "#fffef5" },
       },
     },

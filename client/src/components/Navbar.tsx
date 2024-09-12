@@ -11,6 +11,7 @@ const Navbar = () => {
         <Link to={isAuth ? "/" : "/login"}>
           <div className="flex items-center justify-center">
             <img src="logo.png" alt="logo" className="w-28 h-26" />
+            {/* <img src="logo2.png" alt="logo" className="h-[100px] ml-[-20%] mr-[-18%] mt-[-15%] mb-[-22%]" /> */}
             <h1 className="font-extrabold text-3xl text-orange pl-3">
               Book Store
             </h1>

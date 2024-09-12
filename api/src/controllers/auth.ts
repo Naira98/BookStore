@@ -13,19 +13,19 @@ export const postRegister = async (
   next: NextFunction
 ) => {
   try {
-    const { fullName, email, password, phone, picturePath } = req.body;
+    const { firstName, lastName, email, password, phone, picturePath } =
+      req.body;
     const user = await User.findOne({ email: email });
     if (user) return res.status(400).json({ message: "Email already exists" });
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new User({
-      fullName,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
       phone,
       picture: picturePath
-        ? picturePath
-        : "/assets/profiles/default-profile.jpg",
     });
     const addedUser: Omit<IUser, "password"> & { password?: string } =
       await newUser.save();

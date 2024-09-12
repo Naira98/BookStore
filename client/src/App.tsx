@@ -14,6 +14,7 @@ import UpdateBook from "./pages/UpdateBook";
 import UpdateUser from "./pages/UpdateUser";
 import IsAdmin from "./components/IsAdmin";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import { Toaster } from "react-hot-toast";
 
 
 function App() {
@@ -61,6 +62,29 @@ function App() {
           />
         </Route>
       </Routes>
+      <Toaster
+          position="top-center"
+          gutter={12}
+          containerStyle={{ margin: "8px" }}
+          toastOptions={{
+            // Define default options
+            style: {
+              fontSize: "15px",
+              padding: "16px 24px",
+              maxWidth: "500px",
+              background: "#fffef5",
+              color: "#fb923c",
+            },
+
+            // Default options for specific types
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            },
+          }}
+        />
     </div>
   );
 }

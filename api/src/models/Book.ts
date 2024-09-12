@@ -42,8 +42,7 @@ const bookSchema: Schema = new Schema(
     },
     poster: {
       type: String,
-      required: true,
-      unique: true,
+      default: "",
     },
     author: {
       type: String,

@@ -31,7 +31,7 @@ export const addBook = async (
       availableCopies: copies,
       regularPrice,
       deposit,
-      poster: poster ? poster : "/assets/books/default-book.jpg",
+      poster,
       author,
       description,
     });

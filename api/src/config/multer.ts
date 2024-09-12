@@ -6,7 +6,7 @@ import { IMAGES_PATH } from "../server";
 
 const storageProfile = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(IMAGES_PATH, "profiles"));
+    cb(null, path.join(IMAGES_PATH, "assets", "profiles"));
   },
   filename: (req, file, cb) => {
     const randomeName = nanoid() + path.extname(file.originalname);
@@ -17,7 +17,7 @@ const storageProfile = multer.diskStorage({
 
 const storageBook = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(IMAGES_PATH, "books"));
+    cb(null, path.join(IMAGES_PATH, "assets", "books"));
   },
   filename: (req, file, cb) => {
     const randomeName = nanoid() + path.extname(file.originalname);

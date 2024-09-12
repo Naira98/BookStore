@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
+      // console.log(req.body)
       req.body = schema.parse(req.body);
       next();
     } catch (error) {
@@ -11,9 +12,9 @@ export function validateData(schema: z.ZodObject<any, any>) {
         const errorMessages = error.errors.map((issue: any) => ({
           message: `${issue.path.join(".")} is ${issue.message}`,
         }));
-        res.status(400).json({ error: "Invalid data", details: errorMessages });
+        res.status(400).json({ error: "Invalid data", message: error.errors[0].message });
       } else {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ message: "Internal Server Error" });
       }
     }
   };
