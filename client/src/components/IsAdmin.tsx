@@ -1,7 +1,7 @@
-import { ReactElement } from "react"
+import { ReactElement } from "react";
 
-const IsAdmin = ({children}: {children: ReactElement}) => {
-  return children
-}
+const IsAdmin = ({ children }: { children: ReactElement }) => {
+  return children;
+};
 
-export default IsAdmin
+export default IsAdmin;

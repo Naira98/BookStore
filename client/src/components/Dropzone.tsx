@@ -14,7 +14,7 @@ const Dropzone = ({
     (acceptedFiles: File[]) => {
       setFieldValue("picture", acceptedFiles[0]);
     },
-    [setFieldValue]
+    [setFieldValue],
   );
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -29,11 +29,11 @@ const Dropzone = ({
 
   return (
     <div
-      className={`border-2 rounded-md py-4 px-2 cursor-pointer ${
+      className={`cursor-pointer rounded-md border-2 px-2 py-4 ${
         values.picture
           ? "border-dashed border-cyan-primary text-orange"
           : "border-solid border-gray-secondary text-gray-primary"
-      }  `}
+      } `}
     >
       <div className="text-center" {...getRootProps()}>
         <input {...getInputProps()} />

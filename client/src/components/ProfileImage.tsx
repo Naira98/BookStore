@@ -7,7 +7,7 @@ const ProfileImage = ({ image }: { image: string }) => {
           : "default-profile.jpg"
       }
       alt="profile picture"
-      className="rounded-full h-8 w-8"
+      className="h-8 w-8 rounded-full"
     />
   );
 };

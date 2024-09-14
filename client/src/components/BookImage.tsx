@@ -4,7 +4,7 @@ const BookImage = ({ image }: { image: string }) => {
       src={
         image !== ""
           ? `http://localhost:3000/assets/profiles/${image}`
-          : "default-book2.jpg"
+          : "default-book.jpg"
       }
       alt="profile picture"
       className="h-64 w-44"

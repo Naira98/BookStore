@@ -65,9 +65,9 @@ const RegisterForm = () => {
           }) => (
             <form
               onSubmit={handleSubmit}
-              className="grid gap-6 py-5 px-10 border-2 border-solid border-cyan-secondary rounded-md shadow-md bg-amber-secondary"
+              className="grid gap-6 rounded-md border-2 border-solid border-cyan-secondary bg-amber-secondary px-10 py-5 shadow-md"
             >
-              <h1 className="text-xl font-bold text-center">
+              <h1 className="text-center text-xl font-bold">
                 Register to enjoy reading :)
               </h1>
               <div className="flex gap-4">
@@ -166,7 +166,7 @@ const RegisterForm = () => {
       </Box>
       <h1 className="text-center">
         Already have an account?{" "}
-        <Link to="/login" className="font-bold underline text-orange">
+        <Link to="/login" className="font-bold text-orange underline">
           Login
         </Link>
       </h1>
