@@ -3,15 +3,24 @@
 @tailwind utilities;
 
 @layer components {
-    .btn {
-      @apply py-3 px-6 bg-cyan-primary text-amber-primary font-semibold rounded-full shadow-md hover:bg-cyan-secondary  focus:outline-none focus:ring focus:bg-cyan-primary focus:ring-opacity-75;
-    }
+  .btn {
+    @apply rounded-full bg-cyan-primary px-6 py-3 font-semibold text-amber-primary shadow-md hover:bg-cyan-secondary focus:bg-cyan-primary focus:outline-none focus:ring focus:ring-opacity-75;
+  }
+  .overlay {
+    @apply z-10 opacity-80 transition-all duration-300;
+    transform: translateY(100%);
   }
 
-  /* "bg-cyan-600 text-amber-50 px-3 py-2 rounded-3xl" */
-  /* // background cyan-50
+  .has-overlay:hover .overlay {
+    transform: translateY(0);
+    @apply transform;
+  }
+}
+
+/* "bg-cyan-600 text-amber-50 px-3 py-2 rounded-3xl" */
+/* // background cyan-50
   // text cyan-200 */
-  /* body {
+/* body {
 
       color: #f3ce02
   } */

@@ -8,25 +8,24 @@ import ProfileImage from "./ProfileImage";
 const Navbar = () => {
   const { user, isAuth } = useSelector((state: ReduxState) => state);
   const { logout } = useLogout();
-  console.log(user?.picture);
   return (
-    <div className="min-w-full px-8 shadow-md font-bold">
-      <div className="flex items-center justify-between mx-5">
+    <div className="min-w-full px-8 font-bold shadow-md">
+      <div className="mx-5 flex items-center justify-between">
         <Link to={isAuth ? "/" : "/login"}>
           <div className="flex items-center justify-center">
-            <img src="logo.png" alt="logo" className="w-28 h-26" />
+            <img src="logo.png" alt="logo" className="h-26 w-28" />
             {/* <img src="logo2.png" alt="logo" className="h-[100px] ml-[-20%] mr-[-18%] mt-[-15%] mb-[-22%]" /> */}
-            <h1 className="font-extrabold text-3xl text-orange pl-3">
+            <h1 className="pl-3 text-3xl font-extrabold text-orange">
               Book Store
             </h1>
           </div>
         </Link>
 
-        <div className="space-x-5 flex items-center justify-center mr-4">
+        <div className="mr-4 flex items-center justify-center space-x-5">
           {isAuth && (
             <Link
               to="/update-user"
-              className="space-x-3 flex items-center justify-center"
+              className="flex items-center justify-center space-x-3"
             >
               <ProfileImage image={user!.picture} />
               <h1 className="hover:text-orange">

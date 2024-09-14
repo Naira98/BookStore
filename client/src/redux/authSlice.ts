@@ -9,18 +9,32 @@ export interface IUserModel {
   type: string;
 }
 
-export interface Tokens {
-  accessToken: string;
-  refreshToken: string;
+export interface IBookModel {
+  _id: string;
+  title: string;
+  copies: number;
+  availableCopies: number;
+  regularPrice: number;
+  deposit: number;
+  poster: string;
+  author: string;
+  description: string;
 }
+
+// export interface Tokens {
+//   accessToken: string;
+//   refreshToken: string;
+// }
 
 export interface ReduxState {
   user: IUserModel | null;
   isAuth: boolean;
+  books: IBookModel[] | null;
 }
 const initialState: ReduxState = {
   user: null,
   isAuth: false,
+  books: null,
 };
 
 const authSlice = createSlice({
@@ -36,8 +50,11 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuth = false;
     },
+    setBooks: (state, action) => {
+      state.books = action.payload;
+    },
   },
 });
 
-export const { setLogin, setLogout } = authSlice.actions;
+export const { setLogin, setLogout, setBooks } = authSlice.actions;
 export default authSlice.reducer;

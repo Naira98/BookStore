@@ -9,10 +9,14 @@ export default {
         darkBlue: "#272343",
         orange: "#fb923c",
         cyan: { primary: "#0891b2", secondary: "#06b6d4" },
-        gray: { primary: "#666662", secondary: "#c4c3bc" },
+        gray: { primary: "#3c4245", secondary: "#c4c3bc", text: "#9ca3af" },
         amber: { primary: "#fffbeb", secondary: "#fffef5" },
+        green: "#22c55e",
+        slate: '#64748b'
       },
     },
   },
   plugins: [],
 };
+
+// rgb(60, 66, 69)
