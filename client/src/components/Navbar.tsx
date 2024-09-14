@@ -16,7 +16,7 @@ const Navbar = () => {
             <img src="logo.png" alt="logo" className="h-26 w-28" />
             {/* <img src="logo2.png" alt="logo" className="h-[100px] ml-[-20%] mr-[-18%] mt-[-15%] mb-[-22%]" /> */}
             <h1 className="pl-3 text-3xl font-extrabold text-orange">
-              Book Store
+            The Bookshelf
             </h1>
           </div>
         </Link>

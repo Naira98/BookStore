@@ -29,8 +29,13 @@ function App() {
   }
 
   return (
-    <div className="text-cyan-primary bg-amber-primary tracking-wide min-h-screen">
+    <div className="min-h-screen bg-amber-primary tracking-wide text-cyan-primary">
       <Routes>
+        <Route element={<AppLayout />}>
+          {" "}
+          <Route path="/about" element={<About />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+        </Route>
         <Route
           element={
             <ProtectedLogin>
@@ -49,8 +54,6 @@ function App() {
           }
         >
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/book/:bookId" element={<Book />} />
           <Route path="/history" element={<History />} />
           <Route path="/update-user" element={<UpdateUser />} />
