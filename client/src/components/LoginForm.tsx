@@ -103,7 +103,7 @@ const LoginForm = () => {
 
               <div className="flex justify-center">
                 <button
-                  className="btn max-w-32"
+                  className="btn-primary max-w-32"
                   type="submit"
                   disabled={isPending}
                 >
@@ -116,7 +116,7 @@ const LoginForm = () => {
       </Box>
       <h1 className="text-center">
         Don't have an account?{" "}
-        <Link to="/register" className="font-bold text-orange underline">
+        <Link to="/register" className="font-bold text-orange-primary underline">
           Register Now
         </Link>
       </h1>

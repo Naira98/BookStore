@@ -153,7 +153,7 @@ const RegisterForm = () => {
               <Dropzone values={values} setFieldValue={setFieldValue} />
               <div className="flex justify-center">
                 <button
-                  className="btn max-w-32"
+                  className="btn-primary max-w-32"
                   type="submit"
                   disabled={isPending}
                 >
@@ -166,7 +166,7 @@ const RegisterForm = () => {
       </Box>
       <h1 className="text-center">
         Already have an account?{" "}
-        <Link to="/login" className="font-bold text-orange underline">
+        <Link to="/login" className="font-bold text-orange-primary underline">
           Login
         </Link>
       </h1>

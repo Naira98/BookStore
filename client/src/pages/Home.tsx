@@ -9,7 +9,6 @@ const Home = () => {
 
   if (isPending) return <h1>Loading</h1>;
   if (error) toast.error(error.message);
-  console.log(books);
 
   return (
     <Box className="flex flex-wrap gap-32 px-44 py-16">

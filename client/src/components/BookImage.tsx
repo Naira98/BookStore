@@ -2,12 +2,12 @@ const BookImage = ({ image }: { image: string }) => {
   return (
     <img
       src={
-        image !== ""
+        image
           ? `http://localhost:3000/assets/profiles/${image}`
-          : "default-book.jpg"
+          : "/default-book.jpg"
       }
-      alt="profile picture"
-      className="h-64 w-44"
+      alt="Book Poster"
+      className="object-contain"
     />
   );
 };

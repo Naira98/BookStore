@@ -1,0 +1,1 @@
+export const amountOfWords = 20

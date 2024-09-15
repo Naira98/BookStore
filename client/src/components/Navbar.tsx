@@ -13,9 +13,9 @@ const Navbar = () => {
       <div className="mx-5 flex items-center justify-between">
         <Link to={isAuth ? "/" : "/login"}>
           <div className="flex items-center justify-center">
-            <img src="logo.png" alt="logo" className="h-26 w-28" />
+            <img src="/logo.png" alt="logo" className="h-26 w-28" />
             {/* <img src="logo2.png" alt="logo" className="h-[100px] ml-[-20%] mr-[-18%] mt-[-15%] mb-[-22%]" /> */}
-            <h1 className="pl-3 text-3xl font-extrabold text-orange">
+            <h1 className="pl-3 text-3xl font-extrabold text-orange-primary">
             The Bookshelf
             </h1>
           </div>
@@ -28,7 +28,7 @@ const Navbar = () => {
               className="flex items-center justify-center space-x-3"
             >
               <ProfileImage image={user!.picture} />
-              <h1 className="hover:text-orange">
+              <h1 className="hover:text-orange-primary">
                 {user ? user.firstName : "user"}
               </h1>
             </Link>
@@ -36,7 +36,7 @@ const Navbar = () => {
           <NavLink
             to="/about"
             className={({ isActive }) =>
-              isActive ? "text-orange" : "hover:text-orange"
+              isActive ? "text-orange-primary" : "hover:text-orange-primary"
             }
           >
             About
@@ -44,13 +44,13 @@ const Navbar = () => {
           <NavLink
             to="/contact-us"
             className={({ isActive }) =>
-              isActive ? "text-orange" : "hover:text-orange"
+              isActive ? "text-orange-primary" : "hover:text-orange-primary"
             }
           >
             Contact Us
           </NavLink>
           {isAuth && (
-            <button className="btn" onClick={() => logout()}>
+            <button className="btn-primary" onClick={() => logout()}>
               <LogoutIcon /> Logout
             </button>
           )}

@@ -3,12 +3,12 @@ import { Box } from "@mui/material";
 const About = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-8 py-8">
-      <Box className="w-[40%] rounded-xl border-8 border-orange bg-amber-secondary px-4 py-4 shadow-lg">
-        <h1 className="py-2 text-center text-3xl font-black text-orange">
+      <Box className="w-[40%] rounded-xl border-8 border-orange-primary bg-amber-secondary px-4 py-4 shadow-lg">
+        <h1 className="py-2 text-center text-3xl font-black text-orange-primary">
           About US
         </h1>
         <h1>
-          <span className="font-bold text-orange">The Bookshelf</span> is an
+          <span className="font-bold text-orange-primary">The Bookshelf</span> is an
           online bookstore , We are passionate about making reading more
           accessible and affordable for everyone. Whether you're an avid reader
           or just getting started, our platform provides an extensive collection
@@ -31,13 +31,13 @@ const About = () => {
           Team
         </h1>
       </Box>
-      <Box className="w-[40%] rounded-xl border-8 border-orange bg-amber-secondary px-4 py-4 shadow-lg">
-        <h1 className="py-2 text-center text-3xl font-black text-orange">
+      <Box className="w-[40%] rounded-xl border-8 border-orange-primary bg-amber-secondary px-4 py-4 shadow-lg">
+        <h1 className="py-2 text-center text-3xl font-black text-orange-primary">
           Borrowing Policy
         </h1>
 
         <h1>
-          <span className="font-bold text-orange">
+          <span className="font-bold text-orange-primary">
             Membership Requirements:{" "}
           </span>
           Provide accurate personal information, including a valid email address
@@ -46,36 +46,36 @@ const About = () => {
         <br />
 
         <h1>
-          <span className="font-bold text-orange">Store Wallet System: </span>
+          <span className="font-bold text-orange-primary">Store Wallet System: </span>
           All borrowing fees must be paid through your store wallet. We do not
           accept cash, credit, or debit payments directly.
         </h1>
         <br />
         <h1>
-          <span className="font-bold text-orange">Borrowing Deposit: </span>A
+          <span className="font-bold text-orange-primary">Borrowing Deposit: </span>A
           refundable deposit is required for each book borrowed. The deposit
           amount will be clearly indicated at checkout.
         </h1>
         <br />
 
         <h1>
-          <span className="font-bold text-orange">Borrowing Period: </span>
+          <span className="font-bold text-orange-primary">Borrowing Period: </span>
           The standard borrowing period is{" "}
-          <span className="font-bold text-orange underline">14 days</span>. You
+          <span className="font-bold">14 days</span>. You
           are responsible for returning the book by the due date.
         </h1>
         <br />
         <h1>
-          <span className="font-bold text-orange">Returning the Book: </span>
+          <span className="font-bold text-orange-primary">Returning the Book: </span>
           When you return the book in good condition, your deposit will be fully
           refunded to your store wallet.
         </h1>
         <br />
 
         <h1>
-          <span className="font-bold text-orange">Late Returns: </span>A late
+          <span className="font-bold text-orange-primary">Late Returns: </span>A late
           fee of{" "}
-          <span className="font-bold text-orange underline">
+          <span className="font-bold">
             10% of book price
           </span>{" "}
           will be charged for each day a book is overdue. If the deposit does

@@ -1,19 +1,10 @@
+import { Link } from "react-router-dom";
 import { Box } from "@mui/material";
 import { IBookModel } from "../redux/authSlice";
 import BookImage from "./BookImage";
-import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { formatCurrency } from "../utils/helpers";
 
 const BookCard = ({ book }: { book: IBookModel }) => {
-  const currencyFormatter = useMemo(
-    () =>
-      Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }),
-    [],
-  );
-
   const availablity = book.availableCopies > 0 ? "Available" : "Out of Stock";
   return (
     <Box className="has-overlay relative h-64 w-60">
@@ -27,14 +18,16 @@ const BookCard = ({ book }: { book: IBookModel }) => {
             {availablity}
           </div>
           <div className="relative overflow-hidden">
+            <div className="w-[11rem] h-[16rem]">
             <BookImage image={book.poster} />
+            </div>
             <div className="overlay absolute bottom-0 inline-block w-44 bg-amber-secondary py-4 text-center text-slate">
               View Details
             </div>
           </div>
           <div className="text-center">
             <h2>{book.title}</h2>
-            <h3>{currencyFormatter.format(book.regularPrice)}</h3>
+            <h3>{formatCurrency(book.regularPrice)}</h3>
           </div>
         </div>
       </Link>

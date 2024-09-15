@@ -4,7 +4,7 @@ const ProfileImage = ({ image }: { image: string }) => {
       src={
         image !== ""
           ? `http://localhost:3000/assets/profiles/${image}`
-          : "default-profile.jpg"
+          : "/default-profile.jpg"
       }
       alt="profile picture"
       className="h-8 w-8 rounded-full"
