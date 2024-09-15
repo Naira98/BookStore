@@ -37,7 +37,7 @@ const Book = () => {
   return (
     <>
       <div
-        className="cursor-pointer px-6 py-4 absolute"
+        className="cursor-pointer px-12 py-6 absolute text-lg"
         onClick={() => {
           navigate(-1);
         }}
