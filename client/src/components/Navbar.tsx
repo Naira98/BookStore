@@ -9,14 +9,14 @@ const Navbar = () => {
   const { user, isAuth } = useSelector((state: ReduxState) => state);
   const { logout } = useLogout();
   return (
-    <div className="min-w-full px-8 font-bold shadow-md">
+    <div className="sticky top-0 min-w-full bg-amber-primary px-8 font-bold shadow-md">
       <div className="mx-5 flex items-center justify-between">
         <Link to={isAuth ? "/" : "/login"}>
           <div className="flex items-center justify-center">
             <img src="/logo.png" alt="logo" className="h-26 w-28" />
             {/* <img src="logo2.png" alt="logo" className="h-[100px] ml-[-20%] mr-[-18%] mt-[-15%] mb-[-22%]" /> */}
-            <h1 className="pl-3 text-3xl font-extrabold text-orange-primary">
-            The Bookshelf
+            <h1 className="text-orange-primary pl-3 text-3xl font-extrabold">
+              The Bookshelf
             </h1>
           </div>
         </Link>

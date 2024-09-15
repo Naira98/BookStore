@@ -12,11 +12,13 @@ import History from "./pages/History";
 import AddBook from "./pages/AddBook";
 import AddAdmin from "./pages/AddAdmin";
 import UpdateBook from "./pages/UpdateBook";
-import UpdateUser from "./pages/UpdateUser";
+import Account from "./pages/Account";
+import Wallet from "./pages/Wallet";
 import IsAdmin from "./components/IsAdmin";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import { useGetUser } from "./hooks/useGetUser";
 import ProtectedLogin from "./components/ProtectedLogin";
+import ProfileLayout from "./components/ProfileLayout";
 
 function App() {
   const { isPending, error } = useGetUser();
@@ -55,8 +57,7 @@ function App() {
         >
           <Route path="/" element={<Home />} />
           <Route path="/book/:bookId" element={<Book />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/update-user" element={<UpdateUser />} />
+
           <Route
             path="/add-book"
             element={
@@ -81,6 +82,18 @@ function App() {
               </IsAdmin>
             }
           />
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoutes>
+              <ProfileLayout />
+            </ProtectedRoutes>
+          }
+        >
+          <Route path="/history" element={<History />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/wallet" element={<Wallet />} />
         </Route>
       </Routes>
       <Toaster

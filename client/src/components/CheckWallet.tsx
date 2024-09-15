@@ -1,7 +1,13 @@
+import { Link } from "react-router-dom";
+
 const CheckWallet = () => {
   return (
-    <button className="btn-primary w-44 fixed right-8 bottom-8 py-5">Check Wallet</button>
-  )
-}
+    <Link to="/wallet">
+      <button className="btn-primary fixed bottom-8 right-8 w-44 py-5">
+        Check Wallet
+      </button>
+    </Link>
+  );
+};
 
-export default CheckWallet
+export default CheckWallet;
