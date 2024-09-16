@@ -9,7 +9,7 @@ const Navbar = () => {
   const { user, isAuth } = useSelector((state: ReduxState) => state);
   const { logout } = useLogout();
   return (
-    <div className="sticky top-0 min-w-full bg-amber-primary px-8 font-bold shadow-md">
+    <div className="sticky top-0 min-w-full bg-amber-primary px-8 font-bold shadow-md z-20">
       <div className="mx-5 flex items-center justify-between">
         <Link to={isAuth ? "/" : "/login"}>
           <div className="flex items-center justify-center">

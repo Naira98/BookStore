@@ -7,7 +7,10 @@
     @apply rounded-full bg-cyan-primary px-6 py-3 font-semibold text-amber-primary shadow-md hover:bg-cyan-secondary focus:bg-cyan-primary focus:outline-none focus:ring focus:ring-cyan-secondary focus:ring-opacity-75 focus:ring-offset-1;
   }
   .btn-secondary {
-    @apply bg-orange-primary hover:bg-orange-secondary focus:bg-orange-secondary focus:ring-orange-secondary rounded-full px-6 py-3 font-semibold text-amber-primary shadow-md focus:outline-none focus:ring focus:ring-opacity-75 focus:ring-offset-1;
+    @apply bg-orange-primary hover:bg-orange-secondary focus:bg-orange-secondary focus:ring-orange-secondary rounded-full px-6 py-3 font-semibold text-amber-primary shadow-md focus:outline-none focus:ring focus:ring-opacity-75 focus:ring-offset-1 w-fit;
+  }
+  .btn-tertiary {
+    @apply bg-green-secondary hover:bg-green-primary focus:bg-green-secondary focus:ring-green-secondary w-fit rounded-full px-6 py-3 font-semibold text-amber-primary shadow-md focus:outline-none focus:ring focus:ring-opacity-75 focus:ring-offset-1;
   }
   .btn-unavailable {
     @apply cursor-not-allowed rounded-full bg-gray-secondary px-6 py-3 font-semibold text-amber-primary opacity-90 shadow-md;
@@ -23,7 +26,7 @@
   }
 
   .sidebar-item {
-    @apply flex w-full items-center rounded-lg p-3 text-start leading-tight outline-none transition-all hover:bg-blue hover:bg-opacity-80 hover:text-cyan-primary focus:bg-blue focus:bg-opacity-80 focus:text-cyan-secondary active:bg-grey-secondary active:bg-opacity-80 active:text-cyan-secondary;
+    @apply hover:bg-blue focus:bg-blue active:bg-grey-secondary flex w-full items-center rounded-lg p-3 text-start leading-tight outline-none transition-all hover:bg-opacity-80 hover:text-cyan-primary focus:bg-opacity-80 focus:text-cyan-secondary active:bg-opacity-80 active:text-cyan-secondary;
   }
 }
 

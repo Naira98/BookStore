@@ -41,6 +41,22 @@ export const findBook = async (
   }
 };
 
+export const getHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const history = await Borrow.find({ user: req.user?.userId })
+      .populate("book")
+      .sort("-createdAt");
+    return res.status(200).json(history);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 export const borrowBook = async (
   req: Request,
   res: Response,
@@ -218,7 +234,7 @@ export const addMoney = async (
       success: string;
     };
     const { userId } = req.params;
-    console.log(userId, amount, success);
+    // console.log(userId, amount, success);
 
     if (success === "false") throw new Error("Transfer Failed");
 
@@ -227,7 +243,8 @@ export const addMoney = async (
 
     user.wallet = user.wallet + parseInt(amount);
     const updatedUser = await user.save();
-    res.status(200).json(updatedUser);
+    res.redirect("http://localhost:5173/wallet");
+    // res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);

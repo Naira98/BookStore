@@ -3,11 +3,12 @@ import { useGetBooks } from "../hooks/useGetBooks";
 import BookCard from "../components/BookCard";
 import { Box } from "@mui/material";
 import { IBookModel } from "../redux/authSlice";
+import Spinner from "../components/Spinner";
 
 const Home = () => {
   const { books, isPending, error } = useGetBooks();
 
-  if (isPending) return <h1>Loading</h1>;
+  if (isPending) return <Spinner />;
   if (error) toast.error(error.message);
 
   return (

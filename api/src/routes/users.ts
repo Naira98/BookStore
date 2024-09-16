@@ -3,6 +3,7 @@ import {
   borrowBook,
   createCheckoutSession,
   addMoney,
+  getHistory,
   findAll,
   findBook,
   returnBook,
@@ -23,6 +24,8 @@ router.get(
 );
 
 router.get("/addMoney/:userId", addMoney);
+
+router.get("/history",isAuth, getHistory);
 
 router.get("/:bookId", isAuth, findBook);
 

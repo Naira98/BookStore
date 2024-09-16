@@ -21,6 +21,17 @@ export interface IBookModel {
   description: string;
 }
 
+export interface IBorrowModel {
+  _id: string;
+  book: IBookModel;
+  user: string;
+  regularPrice: number;
+  deposit: number;
+  status: string;
+  borrowingDate: Date;
+  returnDate: Date;
+}
+
 // export interface Tokens {
 //   accessToken: string;
 //   refreshToken: string;
@@ -29,12 +40,10 @@ export interface IBookModel {
 export interface ReduxState {
   user: IUserModel | null;
   isAuth: boolean;
-  books: IBookModel[] | null;
 }
 const initialState: ReduxState = {
   user: null,
   isAuth: false,
-  books: null,
 };
 
 const authSlice = createSlice({
@@ -50,11 +59,9 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuth = false;
     },
-    setBooks: (state, action) => {
-      state.books = action.payload;
-    },
   },
 });
 
-export const { setLogin, setLogout, setBooks } = authSlice.actions;
+export const { setLogin, setLogout } =
+  authSlice.actions;
 export default authSlice.reducer;

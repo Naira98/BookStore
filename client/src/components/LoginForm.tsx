@@ -56,7 +56,7 @@ const LoginForm = () => {
               className="grid gap-6 rounded-md border-2 border-solid border-cyan-secondary bg-amber-secondary px-10 py-5 shadow-md"
             >
               <h1 className="text-center text-xl font-bold">
-                Register to enjoy reading :)
+                Login to enjoy reading :)
               </h1>
 
               <TextField

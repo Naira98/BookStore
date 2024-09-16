@@ -3,13 +3,14 @@ import { ReduxState } from "../redux/authSlice";
 import { formatCurrency } from "../utils/helpers";
 import { useState } from "react";
 import { useAddMoney } from "../hooks/useAddMoney";
+import SpinnerMini from "../components/SpinnerMini";
 
 const Wallet = () => {
   const { wallet } = useSelector((state: ReduxState) => state.user)!;
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("0");
 
-  const { addMoney } = useAddMoney();
+  const { addMoney, isPending } = useAddMoney();
 
   return (
     <>
@@ -45,9 +46,10 @@ const Wallet = () => {
               onClick={() => {
                 addMoney(amount);
               }}
-              className="btn-secondary"
+              className={`btn-secondary px-10 ${amount === "0" && "cursor-not-allowed"}`}
               disabled={amount == "0"}
             >
+              {isPending && <SpinnerMini />}
               Pay
             </button>
           </div>

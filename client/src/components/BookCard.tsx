@@ -12,7 +12,7 @@ const BookCard = ({ book }: { book: IBookModel }) => {
         <div className="flex flex-col items-center gap-2">
           <div
             className={`absolute left-0 top-0 z-10 ${
-              availablity === "Available" ? "bg-green" : "bg-gray-secondary"
+              availablity === "Available" ? "bg-green-primary" : "bg-gray-secondary"
             } px-2 py-1 text-amber-primary opacity-90`}
           >
             {availablity}

@@ -19,11 +19,12 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import { useGetUser } from "./hooks/useGetUser";
 import ProtectedLogin from "./components/ProtectedLogin";
 import ProfileLayout from "./components/ProfileLayout";
+import Spinner from "./components/Spinner";
 
 function App() {
   const { isPending, error } = useGetUser();
 
-  if (isPending) return <h1>Loading...</h1>;
+  if (isPending) return <Spinner />;
   if (error) {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");

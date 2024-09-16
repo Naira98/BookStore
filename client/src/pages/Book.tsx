@@ -4,18 +4,23 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import { useGetBook } from "../hooks/useGetBook";
 import BookImage from "../components/BookImage";
 import { formatCurrency } from "../utils/helpers";
-import { amountOfWords } from "../utils/constants";
+import { AMOUNT_OF_WORDS } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
+import { useBorrow } from "../hooks/useBorrow";
+import Spinner from "../components/Spinner";
+import SpinnerMini from "../components/SpinnerMini";
 
 const Book = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const { book, isPending, error } = useGetBook();
+  const { book, isPending: isPendingGetBook, error } = useGetBook();
+  const { borrow, isPending: isPendingBorrow } = useBorrow();
   const navigate = useNavigate();
 
-  if (isPending) return <h1>Loading...</h1>;
+  if (isPendingGetBook) return <Spinner />;
   if (error) toast.error(error.message);
 
   const {
+    _id,
     title,
     regularPrice,
     deposit,
@@ -26,10 +31,10 @@ const Book = () => {
   } = book;
 
   const splittedText = description.split(" ");
-  const itCanOverflow = splittedText.length > amountOfWords;
+  const itCanOverflow = splittedText.length > AMOUNT_OF_WORDS;
   const text =
     itCanOverflow && !isExpanded
-      ? `${splittedText.slice(0, amountOfWords - 1).join(" ")}.....`
+      ? `${splittedText.slice(0, AMOUNT_OF_WORDS - 1).join(" ")}.....`
       : description;
 
   const available = availableCopies > 0;
@@ -37,7 +42,7 @@ const Book = () => {
   return (
     <>
       <div
-        className="cursor-pointer px-12 py-6 absolute text-lg"
+        className="absolute cursor-pointer px-12 py-6 text-lg"
         onClick={() => {
           navigate(-1);
         }}
@@ -75,7 +80,14 @@ const Book = () => {
             )}
           </h1>
           {available ? (
-            <button className="btn-secondary my-6 w-44">Borrow Now</button>
+            <button
+              disabled={isPendingBorrow}
+              onClick={() => borrow(_id)}
+              className={`btn-secondary my-6 w-44 flex justify-center items-center ${isPendingBorrow && "cursor-not-allowed"}`}
+            >
+              {isPendingBorrow && <SpinnerMini />}
+              Borrow Now
+            </button>
           ) : (
             <button className="btn-unavailable my-6 w-44" disabled>
               Out Of Stock
