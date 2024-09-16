@@ -165,7 +165,6 @@ export const returnBook = async (
   }
 };
 
-const YOUR_DOMAIN = "http://localhost:3000";
 export const createCheckoutSession = async (
   req: Request,
   res: Response,
@@ -181,27 +180,56 @@ export const createCheckoutSession = async (
             currency: "usd",
             unit_amount: Number(price) * 100,
             product_data: {
-              name: "Payment to Bookstore wallet",
-              description: "hi",
+              name: "Payment to The Bookshelf wallet",
+              description: `Adding $${price} to your Bookshelf wallet`,
             },
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${YOUR_DOMAIN}/users/addMoney?success=true`,
-      cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+      success_url: `http://localhost:3000/api/users/addMoney/${req.user?.userId}?amount=${price}&success=true`,
+      cancel_url: `http://localhost:3000/api/users/addMoney/0?success=false`,
     });
-
-    res.status(303).json(session);
+    console.log(session.url);
+    if (session.url) {
+      res.writeHead(302, {
+        Location: session.url,
+      });
+      res.end();
+      // res.redirect(303, session.url);
+    } else {
+      throw new Error("Can't create stripe session");
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
   }
 };
 
-export const addMoney = (req: Request, res: Response, next: NextFunction) => {
+export const addMoney = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    console.log(req);
-  } catch (err) {}
+    const { amount, success } = req.query as {
+      amount: string;
+      success: string;
+    };
+    const { userId } = req.params;
+    console.log(userId, amount, success);
+
+    if (success === "false") throw new Error("Transfer Failed");
+
+    const user = await User.findById(userId);
+    if (!user) throw new Error("Error in server. Please Contact Us");
+
+    user.wallet = user.wallet + parseInt(amount);
+    const updatedUser = await user.save();
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
 };

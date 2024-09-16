@@ -5,12 +5,12 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <nav className="fixed flex h-screen w-[20vw] flex-col gap-1 p-4 font-sans text-base font-normal text-gray-700 shadow-md">
+    <nav className="text-grey-primary fixed flex h-screen w-[20vw] flex-col gap-1 p-4 font-sans text-base font-normal shadow-md">
       <NavLink
         to="/wallet"
         className={({ isActive }) =>
           isActive
-            ? "sidebar-item bg-blue-50 bg-opacity-80 text-cyan-primary"
+            ? "sidebar-item bg-blue bg-opacity-80 text-cyan-primary"
             : "sidebar-item"
         }
       >
@@ -24,7 +24,7 @@ const Sidebar = () => {
         to="/history"
         className={({ isActive }) =>
           isActive
-            ? "sidebar-item bg-blue-50 bg-opacity-80 text-cyan-primary"
+            ? "sidebar-item bg-blue bg-opacity-80 text-cyan-primary"
             : "sidebar-item"
         }
       >
@@ -38,7 +38,7 @@ const Sidebar = () => {
         to="/account"
         className={({ isActive }) =>
           isActive
-            ? "sidebar-item bg-blue-50 bg-opacity-80 text-cyan-primary"
+            ? "sidebar-item bg-blue bg-opacity-80 text-cyan-primary"
             : "sidebar-item"
         }
       >

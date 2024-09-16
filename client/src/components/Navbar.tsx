@@ -24,7 +24,7 @@ const Navbar = () => {
         <div className="mr-4 flex items-center justify-center space-x-5">
           {isAuth && (
             <Link
-              to="/update-user"
+              to="/account"
               className="flex items-center justify-center space-x-3"
             >
               <ProfileImage image={user!.picture} />

@@ -16,13 +16,13 @@ const router = express.Router();
 router.get("/", isAuth, findAll);
 
 router.get(
-  "/create-checkout-session/:price",
+  "/createCheckoutSession/:price",
   isAuth,
   isUser,
   createCheckoutSession
 );
 
-router.get("/addMoney", addMoney);
+router.get("/addMoney/:userId", addMoney);
 
 router.get("/:bookId", isAuth, findBook);
 
