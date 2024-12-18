@@ -7,7 +7,7 @@ import {
   updateAccount,
   postLogout,
 } from "../controllers/auth";
-import { uploadProfile } from "../config/multer";
+import { upload } from "../config/multer";
 import { validateData } from "../middlewares/validations";
 import {
   loginSchema,
@@ -21,25 +21,25 @@ const router = express.Router();
 /* /api/auth */
 router.post(
   "/register",
-  uploadProfile.single("picture"),
-  validateData(registerSchema),
+  upload.single("picture"),
+  // validateData(registerSchema),
   postRegister
 );
 
-router.post("/login", validateData(loginSchema), postLogin);
+// router.post("/login", validateData(loginSchema), postLogin);
 
-router.post("/refresh", refreshToken);
+// router.post("/refresh", refreshToken);
 
-router.get("/user", isAuth,getUser);
+// router.get("/user", isAuth,getUser);
 
-router.patch(
-  "/account",
-  isAuth,
-  uploadProfile.single("picture"),
-  validateData(updateAccountSchema),
-  updateAccount
-);
+// router.patch(
+//   "/account",
+//   isAuth,
+//   uploadProfile.single("picture"),
+//   validateData(updateAccountSchema),
+//   updateAccount
+// );
 
-router.post("/logout", isAuth, postLogout);
+// router.post("/logout", isAuth, postLogout);
 
 export default router;

@@ -6,6 +6,8 @@ import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
 import config from "../config/config";
 import { UserPayload } from "../schemas/userSchemas";
 import Token from "../models/Token";
+import { handleUpload } from "../config/cloudinary";
+import { findUserByEmail, register } from "../services/auth";
 
 export const postRegister = async (
   req: Request,
@@ -13,31 +15,32 @@ export const postRegister = async (
   next: NextFunction
 ) => {
   try {
-    const { firstName, lastName, email, password, phone, picturePath } =
-      req.body;
-    const user = await User.findOne({ email: email });
-    if (user) return res.status(400).json({ message: "Email already exists" });
+    const { full_name, email, password, phone } = req.body;
+
+    const user = await findUserByEmail(email);
+     if (user.length > 0)
+      return res.status(400).json({ message: "Email already exists" });
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      phone,
-      picture: picturePath,
-    });
-    const addedUser: Omit<IUser, "password"> & { password?: string } =
-      await newUser.save();
 
-    delete addedUser.password;
+    let picture = null;
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      const cldRes = await handleUpload(dataURI);
+      console.log(cldRes);
+      picture = cldRes.url
+    }
+    const addedId  = await register(full_name, email, hashedPassword, phone, picture)
+    return res.status(201).json(addedId);
 
-    return res.status(201).json(addedUser);
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
   }
 };
+
 export const postLogin = async (
   req: Request,
   res: Response,
