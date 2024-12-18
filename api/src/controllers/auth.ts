@@ -18,7 +18,7 @@ export const postRegister = async (
     const { full_name, email, password, phone } = req.body;
 
     const user = await findUserByEmail(email);
-     if (user.length > 0)
+     if (user && user.length > 0)
       return res.status(400).json({ message: "Email already exists" });
 
     const salt = await bcrypt.genSalt();

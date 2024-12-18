@@ -7,7 +7,6 @@ export const register = async (
   phone: string,
   picture: string | null
 ) => {
-  try {
     const { data: id, error } = await supabase
       .from("users")
       .insert([
@@ -28,14 +27,9 @@ export const register = async (
       throw new Error(error.message);
     }
     return id;
-  } catch (err) {
-    console.log("err", err);
-    throw err;
-  }
 };
 
 export const findUserByEmail = async (email: string) => {
-  try {
     let { data: user, error } = await supabase
       .from("users")
       .select("id, full_name, email")
@@ -44,10 +38,7 @@ export const findUserByEmail = async (email: string) => {
       throw new Error(error.message);
     }
     return user;
-  } catch (err) {
-    console.log(err);
-    return err;
-  }
+
 };
 // export const register = async() => {
 //     try {
