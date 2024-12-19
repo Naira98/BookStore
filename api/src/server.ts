@@ -6,6 +6,8 @@ import config from "./config/config";
 import authRoutes from "./routes/auth";
 import adminRoutes from "./routes/admins";
 import userRoutes from "./routes/users";
+import { errorHandler } from "./controllers/errorHandler";
+import { notFound } from "./controllers/notFound";
 
 const app = express();
 
@@ -28,6 +30,8 @@ declare module "express" {
 app.use("/api/auth", authRoutes);
 // app.use("/api/admins", adminRoutes);
 // app.use("/api/users", userRoutes);
+app.use(notFound);
+app.use(errorHandler);
 
 // mongoose
 //   .connect(config.mongo.url, { retryWrites: true, w: "majority" })
