@@ -1,15 +1,10 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-  firstName: z
-    .string({ message: "First Name must be a string" })
-    .min(4, { message: "First Name must be 4 or more characters long" })
-    .max(50, { message: "First Name must be 50 or fewer characters long" }),
-
-  lastName: z
-    .string({ message: "Last Name must be a string" })
-    .min(4, { message: "Last Name must be 4 or more characters long" })
-    .max(50, { message: "Last Name must be 50 or fewer characters long" }),
+  full_name: z
+    .string({ message: "Full Name must be a string" })
+    .min(4, { message: "Full Name must be 4 or more characters long" })
+    .max(50, { message: "Full Name must be 50 or fewer characters long" }),
 
   email: z.string().email({ message: "Invalid email address" }),
 
@@ -20,15 +15,13 @@ export const registerSchema = z.object({
 
   phone: z
     .string()
-    .min(4, { message: "Phone Number is too short" })
-    .max(14, { message: "Phone Number is too long" })
     .optional(),
 
-  picturePath: z.string().optional(),
+  picture: z.string().optional(),
 });
 
 export const loginSchema = registerSchema.pick({ email: true, password: true });
 
 export const updateAccountSchema = registerSchema
-  .omit({ password: true })
+  .omit({ password: true, email: true })
   .partial();

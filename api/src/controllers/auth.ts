@@ -1,161 +1,123 @@
-import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User, { IUser } from "../models/User";
 import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
 import config from "../config/config";
 import { UserPayload } from "../schemas/userSchemas";
-import Token from "../models/Token";
-import { handleUpload } from "../config/cloudinary";
-import { findUserByEmail, register } from "../services/auth";
+import { handleUploadPicture } from "../config/cloudinary";
+import {
+  deleteRefreshToken,
+  findRefreshToken,
+  findUserBy,
+  handleUpdateUser,
+  register,
+  upsertRefreshToken,
+} from "../services/auth";
+import { BadRequest, NotFound, Unauthorized } from "../lib/error";
+import { asyncHandler } from "../middlewares/asyncHandler";
+import parsePhoneNumber from "libphonenumber-js";
 
-export const postRegister = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { full_name, email, password, phone } = req.body;
+export const postRegister = asyncHandler(async (req, res) => {
+  const { full_name, email, password, phone } = req.body;
 
-    const user = await findUserByEmail(email);
-     if (user && user.length > 0)
-      return res.status(400).json({ message: "Email already exists" });
+  const phoneNumber = parsePhoneNumber(phone, "EG");
+  if (!phoneNumber?.isValid()) throw new BadRequest("Phone Number incorrect");
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const { picture, cloudinary_public_id } = await handleUploadPicture(req);
+  const { id } = await register(
+    full_name,
+    email,
+    hashedPassword,
+    phoneNumber.number,
+    picture,
+    cloudinary_public_id
+  );
+  return res
+    .status(201)
+    .json({ message: "You registered successfully", id, cloudinary_public_id });
+});
 
-    let picture = null;
-    if (req.file) {
-      const b64 = Buffer.from(req.file.buffer).toString("base64");
-      let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-      const cldRes = await handleUpload(dataURI);
-      console.log(cldRes);
-      picture = cldRes.url
-    }
-    const addedId  = await register(full_name, email, hashedPassword, phone, picture)
-    return res.status(201).json(addedId);
+export const postLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+  type User = Exclude<Awaited<ReturnType<typeof findUserBy>>, null>;
+  const user:
+    | (Omit<User, "password"> & { password?: User["password"] })
+    | null = await findUserBy("email", email);
+  if (!user) throw new BadRequest("Bad Credentials");
 
-export const postLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { email, password } = req.body;
+  const doMatch = await bcrypt.compare(password, user.password!);
+  if (!doMatch) throw new BadRequest("Bad Credentials");
 
-    const user = await User.findOne({ email: email }).select(
-      " -createdAt -updatedAt"
-    );
-    if (!user) return res.status(400).json({ message: "Bad Credentials" });
+  if (user.password) delete user.password;
 
-    const doMatch = await bcrypt.compare(password, user.password!);
-    if (!doMatch) return res.status(400).json({ message: "Bad Credentials" });
+  const accessToken = generateAccessToken({
+    userId: user.id,
+    role: user.role,
+  });
+  const refreshToken = generateRefreshToken({
+    userId: user.id,
+    role: user.role,
+  });
 
-    delete user.password;
+  await upsertRefreshToken(user.id, refreshToken);
 
-    const accessToken = generateAccessToken({
-      userId: user._id.toString(),
-      type: user.type,
-    });
-    const refreshToken = generateRefreshToken({
-      userId: user._id.toString(),
-      type: user.type,
-    });
-    await Token.findOneAndUpdate(
-      { userId: user._id },
-      { $set: { userId: user._id, refreshToken } },
-      { upsert: true }
-    );
+  return res
+    .status(200)
+    .json({ user: user, tokens: { accessToken, refreshToken } });
+});
 
-    return res
-      .status(200)
-      .json({ user, tokens: { accessToken, refreshToken } });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const refreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
 
-export const refreshToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { refreshToken } = req.body;
+  const tokenInDB = await findRefreshToken(refreshToken);
+  if (!tokenInDB) throw new Unauthorized("Invalid Token");
 
-    const tokenInDB = await Token.findOne({ refreshToken });
-    if (!tokenInDB) return res.status(401).json({ message: "Invlaid Token" });
+  const user = jwt.verify(
+    refreshToken,
+    config.jwt.refreshSecret
+  ) as UserPayload;
 
-    const user = jwt.verify(
-      refreshToken,
-      config.jwt.refreshSecret
-    ) as UserPayload;
+  const newAccessToken = generateAccessToken({
+    userId: user.userId,
+    role: user.role,
+  });
 
-    const newAccessToken = generateAccessToken({
-      userId: user.userId,
-      type: user.type,
-    });
+  return res.status(200).json({ accessToken: newAccessToken });
+});
 
-    return res.status(200).json({ accessToken: newAccessToken });
-  } catch (error) {
-    console.log(error);
-    return res.status(401).json({ message: "You are not authenticated" });
-  }
-};
+export const getUser = asyncHandler(async (req, res) => {
+  type User = Exclude<Awaited<ReturnType<typeof findUserBy>>, null>;
 
-export const getUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const user = await User.findById(req.user?.userId).select(
-      "-password -createdAt -updatedAt"
-    );
-    if (!user) return res.status(404).json({ message: "User not found" });
+  const user:
+    | (Omit<User, "password"> & { password?: User["password"] })
+    | null = await findUserBy("id", req.user?.userId!);
+  if (!user) return res.status(404).json({ message: "User not found" });
 
-    return res.status(200).json({ user });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+  delete user.password;
 
-export const updateAccount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const user = await User.findById(req.user?.userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+  return res.status(200).json({ user });
+});
 
-    user.set(req.body);
-    const updatedUser = await user.save();
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const updateAccount = asyncHandler(async (req, res) => {
+  type UpdatedUser = Exclude<
+    Awaited<ReturnType<typeof handleUpdateUser>>,
+    null
+  >;
 
-export const postLogout = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    await Token.findOneAndDelete({ userId: req.user?.userId });
-    return res.status(200).json({ message: "Logged Out!" });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+  const user = await findUserBy("id", req.user?.userId!);
+  if (!user) throw new NotFound("User not found");
+
+  const updatedUser: Omit<UpdatedUser, "password"> & {
+    password?: UpdatedUser["password"] | null;
+  } = await handleUpdateUser(req, user.cloudinary_public_id);
+  
+  delete updatedUser.password;
+  return res.status(200).json(updatedUser);
+});
+
+export const postLogout = asyncHandler(async (req, res) => {
+  await deleteRefreshToken(req.user?.userId!);
+  return res.status(200).json({ message: "Logged Out!" });
+});

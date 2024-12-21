@@ -22,24 +22,24 @@ const router = express.Router();
 router.post(
   "/register",
   upload.single("picture"),
-  // validateData(registerSchema),
+  validateData(registerSchema),
   postRegister
 );
 
-// router.post("/login", validateData(loginSchema), postLogin);
+router.post("/login", validateData(loginSchema), postLogin);
 
-// router.post("/refresh", refreshToken);
+router.post("/refresh", refreshToken);
 
-// router.get("/user", isAuth,getUser);
+router.get("/user", isAuth, getUser);
 
-// router.patch(
-//   "/account",
-//   isAuth,
-//   uploadProfile.single("picture"),
-//   validateData(updateAccountSchema),
-//   updateAccount
-// );
+router.patch(
+  "/account",
+  isAuth,
+  upload.single("picture"),
+  validateData(updateAccountSchema),
+  updateAccount
+);
 
-// router.post("/logout", isAuth, postLogout);
+router.post("/logout", isAuth, postLogout);
 
 export default router;

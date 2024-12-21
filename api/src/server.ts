@@ -8,8 +8,9 @@ import adminRoutes from "./routes/admins";
 import userRoutes from "./routes/users";
 import { errorHandler } from "./controllers/errorHandler";
 import { notFound } from "./controllers/notFound";
+import { Database } from "./services/supabase";
 
-const app = express();
+export const app = express();
 
 export const IMAGES_PATH = path.join(__dirname, "..", "public", "assets");
 
@@ -21,8 +22,8 @@ app.use(cors());
 declare module "express" {
   interface Request {
     user?: {
-      userId?: string;
-      role?: "user" | "super_admin" | "admin" | "courier";
+      userId: number;
+      role: Database["public"]["Enums"]["role_type"];
     };
   }
 }
@@ -38,6 +39,6 @@ app.use(errorHandler);
 //   .then(() => console.info("Connected to MongoDB"))
 //   .catch((err) => console.log(err));
 
-app.listen(config.server.port, () => {
+export const server = app.listen(config.server.port, () => {
   console.log(`Server running on port ${config.server.port}`);
 });

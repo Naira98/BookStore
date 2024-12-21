@@ -305,8 +305,38 @@ export type Database = {
         }
         Relationships: []
       }
+      tokens: {
+        Row: {
+          created_at: string
+          id: number
+          refresh_token: string
+          user_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          refresh_token: string
+          user_id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          refresh_token?: string
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
+          cloudinary_public_id: string | null
           created_at: string
           email: string
           full_name: string
@@ -318,6 +348,7 @@ export type Database = {
           wallet: number
         }
         Insert: {
+          cloudinary_public_id?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -329,6 +360,7 @@ export type Database = {
           wallet?: number
         }
         Update: {
+          cloudinary_public_id?: string | null
           created_at?: string
           email?: string
           full_name?: string
