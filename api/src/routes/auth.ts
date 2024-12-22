@@ -10,8 +10,8 @@ import {
 import { upload } from "../config/multer";
 import { validateData } from "../middlewares/validations";
 import {
-  loginSchema,
   registerSchema,
+  loginSchema,
   updateAccountSchema,
 } from "../schemas/authSchemas";
 import { isAuth } from "../middlewares/is-Auth";

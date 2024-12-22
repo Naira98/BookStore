@@ -2,6 +2,7 @@ import { Request } from "express";
 import supabase from "./db";
 import { handleDeletePicture, handleUploadPicture } from "../config/cloudinary";
 import { Conflict, Unauthorized } from "../lib/error";
+import { Database } from "./supabase";
 
 export const register = async (
   full_name: string,
@@ -9,7 +10,8 @@ export const register = async (
   password: string,
   phone: string,
   picture: string | null,
-  cloudinary_public_id: string | null
+  cloudinary_public_id: string | null,
+  role: Database['public']['Enums']['role_type']
 ) => {
   const { data, error } = await supabase
     .from("users")
@@ -21,7 +23,7 @@ export const register = async (
         phone,
         picture,
         cloudinary_public_id,
-        role: "user",
+        role,
         wallet: 0,
       },
     ])
@@ -59,7 +61,7 @@ export const handleUpdateUser = async (
 
       const { data, error } = await supabase
         .from("users")
-        .update({ ...req.body, picture })
+        .update({ ...req.body, ...picture })
         .eq("id", req.user.userId)
         .select()
         .single();

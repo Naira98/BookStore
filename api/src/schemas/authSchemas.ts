@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const registerSchema = z.object({
+export const addEmployeeSchema = z.object({
   full_name: z
     .string({ message: "Full Name must be a string" })
     .min(4, { message: "Full Name must be 4 or more characters long" })
@@ -13,15 +13,19 @@ export const registerSchema = z.object({
     .min(4, { message: "Password must be 4 or more characters long" })
     .max(30, { message: "Password must be 30 or fewer characters long" }),
 
-  phone: z
-    .string()
-    .optional(),
+  phone: z.string().optional(),
 
   picture: z.string().optional(),
+  role: z.enum(["user", "super_admin", "admin", "courier"]),
 });
 
-export const loginSchema = registerSchema.pick({ email: true, password: true });
+export const registerSchema = addEmployeeSchema.omit({ role: true });
 
-export const updateAccountSchema = registerSchema
-  .omit({ password: true, email: true })
+export const loginSchema = addEmployeeSchema.pick({
+  email: true,
+  password: true,
+});
+
+export const updateAccountSchema = addEmployeeSchema
+  .omit({ password: true, email: true, role: true })
   .partial();

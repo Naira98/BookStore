@@ -1,113 +1,62 @@
-import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
-import Book from "../models/Book";
-import User from "../models/User";
+import { asyncHandler } from "../middlewares/asyncHandler";
+import {
+  handleAddBook,
+  handleUpdateBook,
+  handleUpdateSettings,
+} from "../services/admins";
+import { handleUploadPicture } from "../config/cloudinary";
+import { findBookBy } from "../services/users";
+import { BadRequest, NotFound } from "../lib/error";
+import parsePhoneNumber from "libphonenumber-js";
+import { register } from "../services/auth";
 
-export const addBook = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const {
-      title,
-      copies,
-      regularPrice,
-      deposit,
-      poster,
-      author,
-      description,
-    } = req.body;
+export const addBook = asyncHandler(async (req, res) => {
+  const { picture, cloudinary_public_id } = await handleUploadPicture(req);
+  const addedBookId = await handleAddBook(
+    req.body,
+    picture,
+    cloudinary_public_id
+  );
+  return res.status(201).json(addedBookId);
+});
 
-    const book = await Book.findOne({ title: title });
-    if (book) {
-      return res
-        .status(400)
-        .json({ message: "Book already exists you can add copies only" });
-    }
-    const newBook = new Book({
-      title,
-      copies,
-      availableCopies: copies,
-      regularPrice,
-      deposit,
-      poster,
-      author,
-      description,
-    });
-    const addedBook = await newBook.save();
-    return res.status(201).json(addedBook);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const updateBook = asyncHandler(async (req, res) => {
+  const bookId = req.params.bookId;
+  const book = await findBookBy("id", bookId);
+  if (!book) throw new NotFound("Book not found");
+  const updatedBook = await handleUpdateBook(
+    +bookId,
+    req,
+    book.cloudinary_public_id
+  );
+  return res.status(200).json(updatedBook);
+});
 
-export const addCopies = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const bookId = req.params.bookId;
-    const { copies } = req.body;
+export const addEmployee = asyncHandler(async (req, res) => {
+  const { full_name, email, password, phone, role } = req.body;
 
-    const book = await Book.findByIdAndUpdate(
-      bookId,
-      {
-        $inc: { copies, availableCopies: copies },
-      },
-      { returnOriginal: false }
-    );
-    return res.status(200).json(book);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+  const phoneNumber = parsePhoneNumber(phone, "EG");
+  if (!phoneNumber?.isValid()) throw new BadRequest("Phone Number incorrect");
 
-export const updateBook = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const bookId = req.params.bookId;
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const { picture, cloudinary_public_id } = await handleUploadPicture(req);
+  const { id } = await register(
+    full_name,
+    email,
+    hashedPassword,
+    phoneNumber.number,
+    picture,
+    cloudinary_public_id,
+    role
+  );
+  return res
+    .status(201)
+    .json({ message: "You registered successfully", id, cloudinary_public_id });
+});
 
-    const book = await Book.findById(bookId);
-    if (!book) return res.status(404).json({ message: "Book not found" });
-    book?.set(req.body);
-    const updatedBook = await book.save();
-    return res.status(200).json(updatedBook);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-
-export const addAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { fullName, email, password, phone, picture } = req.body;
-    const user = await User.findOne({ email: email });
-    if (user) return res.status(400).json({ message: "Email already exists" });
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({
-      fullName,
-      email,
-      password: hashedPassword,
-      phone,
-      picture: picture ? picture : "profiles/default-profile.jpg",
-      type: "admin",
-    });
-    const addedAdmin = await newUser.save();
-    return res.status(201).json(addedAdmin);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const updateSettings = asyncHandler(async (req, res) => {
+  const updatedSettings = await handleUpdateSettings(req);
+  return res.status(200).json(updatedSettings);
+});

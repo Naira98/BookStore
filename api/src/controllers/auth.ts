@@ -31,7 +31,8 @@ export const postRegister = asyncHandler(async (req, res) => {
     hashedPassword,
     phoneNumber.number,
     picture,
-    cloudinary_public_id
+    cloudinary_public_id,
+    "user"
   );
   return res
     .status(201)
@@ -60,9 +61,7 @@ export const postLogin = asyncHandler(async (req, res) => {
     userId: user.id,
     role: user.role,
   });
-
   await upsertRefreshToken(user.id, refreshToken);
-
   return res
     .status(200)
     .json({ user: user, tokens: { accessToken, refreshToken } });
@@ -105,14 +104,11 @@ export const updateAccount = asyncHandler(async (req, res) => {
     Awaited<ReturnType<typeof handleUpdateUser>>,
     null
   >;
-
   const user = await findUserBy("id", req.user?.userId!);
   if (!user) throw new NotFound("User not found");
-
   const updatedUser: Omit<UpdatedUser, "password"> & {
     password?: UpdatedUser["password"] | null;
   } = await handleUpdateUser(req, user.cloudinary_public_id);
-  
   delete updatedUser.password;
   return res.status(200).json(updatedUser);
 });

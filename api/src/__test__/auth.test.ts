@@ -61,6 +61,7 @@ describe("Auth", () => {
       expect(res.status).toBe(200);
       expect(res.body.user.email).toBe(userData.email);
       expect(res.body.user.password).toBeUndefined();
+      expect(res.body.user.role).toEqual("user");
       expect(res.body.tokens.accessToken).toBeTruthy();
       expect(res.body.tokens.refreshToken).toBeTruthy();
       accessToken = res.body.tokens.accessToken;

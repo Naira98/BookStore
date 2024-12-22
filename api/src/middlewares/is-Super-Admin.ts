@@ -5,7 +5,7 @@ export const isSuperAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  if (req.user?.type !== "superAdmin") {
+  if (req.user?.role !== "super_admin") {
     return res.status(403).json({ message: "Unauthorized" });
   }
   next();

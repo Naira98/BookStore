@@ -29,7 +29,7 @@ declare module "express" {
 }
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/admins", adminRoutes);
+app.use("/api/admins", adminRoutes);
 // app.use("/api/users", userRoutes);
 app.use(notFound);
 app.use(errorHandler);

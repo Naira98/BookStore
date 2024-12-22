@@ -22,6 +22,8 @@ export const postReqFormData = async (
   for (const [key, value] of Object.entries(body)) {
     if (key !== "picture") req = req.field(key, value);
   }
+  /* Send wrong role with request and test it after login */
+  req.field("role", "admin");
 
   body.picture && req.attach("picture", body.picture, { filename });
   accessToken && req.set("Authorization", `Bearer ${accessToken}`);

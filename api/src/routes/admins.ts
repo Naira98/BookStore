@@ -1,56 +1,54 @@
 import express from "express";
-import {
-  addAdmin,
-  addBook,
-  addCopies,
-  updateBook,
-} from "../controllers/admins";
+import { addEmployee, addBook, updateBook } from "../controllers/admins";
 import { isAdmin } from "../middlewares/is-Admin";
 import { isSuperAdmin } from "../middlewares/is-Super-Admin";
-import { uploadBook } from "../config/multer";
+import { upload } from "../config/multer";
 import { validateData } from "../middlewares/validations";
 import {
   addBookSchema,
-  addCopiesSchema,
   updateBookShema,
+  updateSettingsSchema,
 } from "../schemas/adminSchemas";
-import { registerSchema } from "../schemas/authSchemas";
+import { addEmployeeSchema } from "../schemas/authSchemas";
 import { isAuth } from "../middlewares/is-Auth";
 const router = express.Router();
 
-/* api//admins */
+/* /api/admins */
 router.post(
   "/addBook",
   isAuth,
   isAdmin,
-  uploadBook.single("picture"),
+  upload.single("picture"),
   validateData(addBookSchema),
   addBook
-);
-
-router.patch(
-  "/addCopies/:bookId",
-  isAuth,
-  isAdmin,
-  validateData(addCopiesSchema),
-  addCopies
 );
 
 router.patch(
   "/book/:bookId",
   isAuth,
   isAdmin,
-  uploadBook.single("picture"),
+  upload.single("picture"),
   validateData(updateBookShema),
   updateBook
 );
 
+// (admin) approval for pickup and drop off
+// (courier) approval for book return, book delivered and payment
+
 router.post(
-  "/addAdmin",
+  "/addEmployee",
   isAuth,
   isSuperAdmin,
-  validateData(registerSchema),
-  addAdmin
+  validateData(addEmployeeSchema),
+  addEmployee
+);
+
+router.post(
+  "/updateSettings",
+  isAuth,
+  isSuperAdmin,
+  validateData(updateSettingsSchema),
+  addEmployee
 );
 
 export default router;
