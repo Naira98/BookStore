@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export const addBookSchema = z.object({
   title: z
@@ -7,6 +7,7 @@ export const addBookSchema = z.object({
     .max(50, { message: "Title must be less than 50 characters" }),
 
   all_copies: z.string(),
+  copies_in_stock: z.string().optional(),
   regular_price: z.string(),
   deposit: z.string(),
   description: z
@@ -28,16 +29,24 @@ export const addBookSchema = z.object({
   publish_year: z.string().optional(),
 });
 
-export const updateBookShema = addBookSchema.partial();
+export const updateBookShema = addBookSchema
+  .omit({ category: true, author: true })
+  .partial();
+
+export const updateBookAuthorSchema = addBookSchema.pick({ author: true });
+export const updateBookCategorySchema = addBookSchema.pick({ category: true });
 
 export const updateSettingsSchema = z.object({
   borrow_days: z
     .number({ message: "Borrow Days must be a number" })
-    .min(0, { message: "Borrow Days can't be less than 0" }),
+    .min(0, { message: "Borrow Days can't be less than 0" })
+    .optional(),
   delay_fees_per_day: z
     .number({ message: "Delay fees per day must be a number" })
-    .min(0, { message: "Delay fees per day can't be less than 0" }),
+    .min(0, { message: "Delay fees per day can't be less than 0" })
+    .optional(),
   delivery_fees: z
     .number({ message: "Delivery fees must be a number" })
-    .min(0, { message: "Delivery fees can't be less than 0" }),
+    .min(0, { message: "Delivery fees can't be less than 0" })
+    .optional(),
 });

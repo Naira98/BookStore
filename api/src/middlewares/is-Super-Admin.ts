@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { Forbidden } from "../lib/error";
 
 export const isSuperAdmin = (
   req: Request,
@@ -6,7 +7,7 @@ export const isSuperAdmin = (
   next: NextFunction
 ) => {
   if (req.user?.role !== "super_admin") {
-    return res.status(403).json({ message: "Unauthorized" });
+    throw new Forbidden("Forbidden");
   }
   next();
 };

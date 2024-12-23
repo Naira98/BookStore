@@ -49,7 +49,7 @@ export const postLogin = asyncHandler(async (req, res) => {
   if (!user) throw new BadRequest("Bad Credentials");
 
   const doMatch = await bcrypt.compare(password, user.password!);
-  if (!doMatch) throw new BadRequest("Bad Credentials");
+  if (!doMatch) throw new BadRequest("Bad Credentialssss");
 
   if (user.password) delete user.password;
 

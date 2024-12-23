@@ -6,6 +6,7 @@ import { handleDeletePicture, handleUploadPicture } from "../config/cloudinary";
 interface bodyType {
   title: string;
   all_copies: number;
+  copies_in_stock?: number;
   regular_price: number;
   deposit: number;
   author: string;
@@ -14,48 +15,66 @@ interface bodyType {
   publish_year?: number | null;
 }
 
+const upsertAuthor = async (author: string) => {
+  const { data: authorData, error } = await supabase
+    .from("authors")
+    .upsert({ name: author }, { onConflict: "name" })
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    if (error.code == "23505") throw new BadRequest(error.message);
+    throw new Error(error.message);
+  }
+  return authorData?.id;
+};
+
+const upsertCategory = async (category: string) => {
+  const { data: categoryData, error } = await supabase
+    .from("categories")
+    .upsert({ name: category }, { onConflict: "name" })
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    if (error.code == "23505") throw new BadRequest(error.message);
+    throw new Error(error.message);
+  }
+
+  return categoryData?.id;
+};
+
 export const handleAddBook = async (
   {
     title,
     description,
     all_copies,
+    copies_in_stock = all_copies,
     regular_price,
     deposit,
     author,
     category,
     publish_year,
   }: bodyType,
-  cover: string | null,
+  picture: string | null,
   cloudinary_public_id: string | null
 ) => {
-  /* Add Author */
-  const { data: author_id, error: error1 } = await supabase
-    .from("authors")
-    .upsert({ name: author }, { onConflict: "name" })
-    .select("id")
-    .maybeSingle();
-
-  /* Add Category */
-  const { data: category_id, error: error2 } = await supabase
-    .from("categories")
-    .upsert({ name: category }, { onConflict: "name" })
-    .select("id")
-    .maybeSingle();
-
+  const [author_id, category_id] = await Promise.all([
+    upsertAuthor(author),
+    upsertCategory(category),
+  ]);
   /* Add Book */
-  const { data: book_id, error: error3 } = await supabase
+  const { data: book_id, error } = await supabase
     .from("books")
     .insert([
       {
         title,
         description,
-        author_id: author_id?.id,
-        category_id: category_id?.id,
+        author_id: author_id,
+        category_id: category_id,
         all_copies,
-        copies_in_stock: all_copies,
+        copies_in_stock,
         regular_price,
         deposit,
-        cover,
+        picture,
         cloudinary_public_id,
         publish_year,
       },
@@ -63,10 +82,7 @@ export const handleAddBook = async (
     .select("id")
     .single();
 
-  const error = error1 || error2 || error3;
-
   if (error) {
-    console.log(error);
     if (error.code == "23505") throw new BadRequest(error.message);
     throw new Error(error.message);
   }
@@ -78,7 +94,7 @@ export const handleUpdateBook = async (
   req: Request,
   oldPicurePublicId?: string | null
 ) => {
-  if (req.body.picture) {
+  if (req.file) {
     await handleDeletePicture(oldPicurePublicId);
     const picture = await handleUploadPicture(req);
 
@@ -88,9 +104,8 @@ export const handleUpdateBook = async (
       .eq("id", book_id)
       .select()
       .single();
-    if (error) {
-      throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
+
     return data;
   } else {
     const { data, error } = await supabase
@@ -99,11 +114,40 @@ export const handleUpdateBook = async (
       .eq("id", book_id)
       .select()
       .single();
-    if (error) {
-      throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
+
     return data;
   }
+};
+
+export const handleUpdateBookAuthor = async (
+  book_id: number,
+  author: string
+) => {
+  const author_id = await upsertAuthor(author);
+  const { data, error } = await supabase
+    .from("books")
+    .update({ author_id })
+    .eq("id", book_id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export const handleUpdateBookCategory = async (
+  book_id: number,
+  category: string
+) => {
+  const category_id = await upsertCategory(category);
+  const { data, error } = await supabase
+    .from("books")
+    .update({ category_id })
+    .eq("id", book_id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
 };
 
 export const handleUpdateSettings = async (req: Request) => {
@@ -113,8 +157,11 @@ export const handleUpdateSettings = async (req: Request) => {
     .eq("id", 1)
     .select()
     .single();
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
   return data;
+};
+
+export const handleDeleteBook = async (book_id: number) => {
+  const { error } = await supabase.from("books").delete().eq("id", book_id);
+  if (error) throw new Error(error.message);
 };

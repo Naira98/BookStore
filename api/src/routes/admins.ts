@@ -1,11 +1,21 @@
 import express from "express";
-import { addEmployee, addBook, updateBook } from "../controllers/admins";
+import {
+  addEmployee,
+  addBook,
+  updateBook,
+  updateBookAuthor,
+  updateBookCategory,
+  deleteBook,
+  updateSettings,
+} from "../controllers/admins";
 import { isAdmin } from "../middlewares/is-Admin";
 import { isSuperAdmin } from "../middlewares/is-Super-Admin";
 import { upload } from "../config/multer";
 import { validateData } from "../middlewares/validations";
 import {
   addBookSchema,
+  updateBookAuthorSchema,
+  updateBookCategorySchema,
   updateBookShema,
   updateSettingsSchema,
 } from "../schemas/adminSchemas";
@@ -32,6 +42,22 @@ router.patch(
   updateBook
 );
 
+router.patch(
+  "/book/author/:bookId",
+  isAuth,
+  isAdmin,
+  validateData(updateBookAuthorSchema),
+  updateBookAuthor
+);
+
+router.patch(
+  "/book/category/:bookId",
+  isAuth,
+  isAdmin,
+  validateData(updateBookCategorySchema),
+  updateBookCategory
+);
+
 // (admin) approval for pickup and drop off
 // (courier) approval for book return, book delivered and payment
 
@@ -39,16 +65,19 @@ router.post(
   "/addEmployee",
   isAuth,
   isSuperAdmin,
+  upload.single("picture"),
   validateData(addEmployeeSchema),
   addEmployee
 );
 
-router.post(
+router.patch(
   "/updateSettings",
   isAuth,
   isSuperAdmin,
   validateData(updateSettingsSchema),
-  addEmployee
+  updateSettings
 );
+
+router.delete("/:bookId", isAuth, isAdmin, deleteBook);
 
 export default router;

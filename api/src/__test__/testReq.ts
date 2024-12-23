@@ -13,7 +13,7 @@ export const getReq = async (endPoint: string, accessToken?: string) => {
 
 export const postReqFormData = async (
   endPoint: string,
-  body: { [key: string]: string | Buffer },
+  body: { [key: string]: string | number | Buffer },
   filename?: string,
   accessToken?: string
 ) => {
@@ -22,8 +22,6 @@ export const postReqFormData = async (
   for (const [key, value] of Object.entries(body)) {
     if (key !== "picture") req = req.field(key, value);
   }
-  /* Send wrong role with request and test it after login */
-  req.field("role", "admin");
 
   body.picture && req.attach("picture", body.picture, { filename });
   accessToken && req.set("Authorization", `Bearer ${accessToken}`);
@@ -32,8 +30,8 @@ export const postReqFormData = async (
 
 export const postReqJson = async (
   endPoint: string,
-  body?: { [key: string]: string | Buffer },
-  accessToken?: string
+  accessToken?: string,
+  body?: { [key: string]: string | number | Buffer }
 ) => {
   let req = request(app)
     .post(`/api${endPoint}`)
@@ -46,10 +44,26 @@ export const postReqJson = async (
   return await req;
 };
 
-export const patchReq = async (
+export const patchReqFormData = async (
+  endPoint: string,
+  body: { [key: string]: string | number | Buffer },
+  filename?: string,
+  accessToken?: string
+) => {
+  let req = request(app).patch(`/api${endPoint}`);
+
+  for (const [key, value] of Object.entries(body)) {
+    if (key !== "picture") req = req.field(key, value);
+  }
+  body.picture && req.attach("picture", body.picture, { filename });
+  accessToken && req.set("Authorization", `Bearer ${accessToken}`);
+  return await req;
+};
+
+export const patchReqJson = async (
   endPoint: string,
   accessToken?: string,
-  body?: { [key: string]: string }
+  body?: { [key: string]: string | number }
 ) => {
   let req = request(app)
     .patch(`/api${endPoint}`)

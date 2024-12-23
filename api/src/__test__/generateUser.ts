@@ -3,14 +3,14 @@ import path from "path";
 import fs from "fs";
 
 const testImgPath = path.join(__dirname, "..", "assets", "profile_img.jpeg");
-const testImg = fs.readFileSync(testImgPath);
+export const profileTestImg = fs.readFileSync(testImgPath);
 
-export function generateUserData() {
+export function generateUserData(withPhoto = true) {
   return {
     full_name: faker.person.fullName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
     phone: "+2011111111",
-    picture: testImg,
+    ...(withPhoto ? { picture: profileTestImg } : null),
   };
 }

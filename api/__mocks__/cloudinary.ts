@@ -1,4 +1,5 @@
 import { UploadApiResponse } from "cloudinary";
+import { faker } from "@faker-js/faker";
 
 const cloudinary: typeof import("cloudinary") =
   jest.createMockFromModule("cloudinary");
@@ -7,7 +8,7 @@ const upload: typeof cloudinary.v2.uploader.upload =
   async (): Promise<UploadApiResponse> => {
     return {
       url: "https://example.org/path/to/image.png",
-      public_id: "1234567890",
+      public_id: faker.number.int({ min: 1000000 }).toString(),
     } as UploadApiResponse;
   };
 

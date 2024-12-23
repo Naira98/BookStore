@@ -11,7 +11,7 @@ export const register = async (
   phone: string,
   picture: string | null,
   cloudinary_public_id: string | null,
-  role: Database['public']['Enums']['role_type']
+  role: Database["public"]["Enums"]["role_type"] = "user"
 ) => {
   const { data, error } = await supabase
     .from("users")
@@ -27,7 +27,7 @@ export const register = async (
         wallet: 0,
       },
     ])
-    .select("id")
+    .select("id, role")
     .single();
 
   if (error) {
@@ -55,10 +55,9 @@ export const handleUpdateUser = async (
   oldPicurePublicId: string | null
 ) => {
   if (req.user?.userId) {
-    if (req.body.picture) {
+    if (req.file) {
       await handleDeletePicture(oldPicurePublicId);
       const picture = await handleUploadPicture(req);
-
       const { data, error } = await supabase
         .from("users")
         .update({ ...req.body, ...picture })

@@ -7,7 +7,6 @@ export function validateData(schema: z.ZodObject<any, any>) {
       req.body = schema.parse(req.body);
       next();
     } catch (error) {
-      console.log("Zod Error", error);
       if (error instanceof ZodError) {
         // const errorMessages = error.errors.map((issue: any) => ({
         //   message: `${issue.path.join(".")} is ${issue.message}`,
