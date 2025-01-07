@@ -10,14 +10,10 @@ export const errorHandler: ErrorRequestHandler = (
 ) => {
   console.log({ error });
   if (error instanceof ApplicationError) {
-    res.status(error.status);
-    res.json({ message: error.message });
-    return;
+    return res.status(error.status).json({ message: error.message });
   }
 
-  res.status(500);
-  res.json({
+  return res.status(500).json({
     message: error.message,
   });
-  //   return res.status(500).json(error);
 };

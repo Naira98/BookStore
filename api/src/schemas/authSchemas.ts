@@ -13,8 +13,7 @@ export const addEmployeeSchema = z.object({
     .min(4, { message: "Password must be 4 or more characters long" })
     .max(30, { message: "Password must be 30 or fewer characters long" }),
 
-  phone: z.string().optional(),
-
+  phone: z.string(),
   picture: z.string().optional(),
   role: z.enum(["user", "super_admin", "admin", "courier"]),
 });
@@ -27,5 +26,9 @@ export const loginSchema = addEmployeeSchema.pick({
 });
 
 export const updateAccountSchema = addEmployeeSchema
-  .omit({ password: true, email: true, role: true })
-  .partial();
+.omit({ password: true, email: true, role: true })
+.partial();
+
+export const refreshSchema = z.object({
+  refresh_token: z.string(),
+});

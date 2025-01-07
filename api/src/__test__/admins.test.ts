@@ -7,8 +7,8 @@ import {
   postReqFormData,
 } from "./testReq";
 import { login, loginWithSuperAdmin, loginWithUser } from "./loginUsers";
-import { Database } from "../services/supabase";
 import { generateUserData } from "./generateUser";
+import { IBook } from "../types/db_types";
 
 describe("Admins", () => {
   let superAdminAccessToken: string;
@@ -16,7 +16,7 @@ describe("Admins", () => {
   let adminAccessToken: string;
   let courierAccessToken: string;
   let book_id: number;
-  let returnedBook: Database["public"]["Tables"]["books"]["Row"];
+  let returnedBook: IBook
   const bookData = generateBookData();
 
   beforeAll(async () => {

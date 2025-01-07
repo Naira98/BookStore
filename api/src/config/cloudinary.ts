@@ -9,8 +9,8 @@ cloudinary.config({
 });
 
 export async function handleUploadPicture(req: Request) {
-  let picture = null;
-  let cloudinary_public_id = null;
+  let picture: string | null = null;
+  let cloudinary_public_id: string | null = null;
   if (req.file) {
     const b64 = Buffer.from(req.file.buffer).toString("base64");
     let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
@@ -18,12 +18,14 @@ export async function handleUploadPicture(req: Request) {
       resource_type: "auto",
     });
     picture = cldRes.url;
-    cloudinary_public_id = cldRes.public_id
+    cloudinary_public_id = cldRes.public_id;
   }
-  return {picture, cloudinary_public_id};
+  return { picture, cloudinary_public_id };
 }
 
-export async function handleDeletePicture(cloudinary_public_id?: string | null) {
+export async function handleDeletePicture(
+  cloudinary_public_id?: string | null
+) {
   if (cloudinary_public_id) {
     await cloudinary.uploader.destroy(cloudinary_public_id);
   }

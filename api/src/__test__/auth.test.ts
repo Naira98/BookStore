@@ -6,7 +6,7 @@ import {
   postReqFormData,
   postReqJson,
 } from "./testReq";
-import { faker } from "@faker-js/faker/.";
+import { faker } from "@faker-js/faker";
 
 let accessToken: string;
 let refreshToken: string;

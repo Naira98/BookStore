@@ -1,45 +1,42 @@
 import { Request } from "express";
 import { BadRequest } from "../lib/error";
-import supabase from "./db";
+import { IBook } from "../types/db_types";
+import { authors, books, categories, settings } from "./db";
 import { handleDeletePicture, handleUploadPicture } from "../config/cloudinary";
 
-interface bodyType {
-  title: string;
-  all_copies: number;
-  copies_in_stock?: number;
-  regular_price: number;
-  deposit: number;
+interface addBookBody extends IBook {
   author: string;
   category: string;
-  description?: string | null;
-  publish_year?: number | null;
 }
 
 const upsertAuthor = async (author: string) => {
-  const { data: authorData, error } = await supabase
-    .from("authors")
-    .upsert({ name: author }, { onConflict: "name" })
-    .select("id")
-    .maybeSingle();
-  if (error) {
+  try {
+    const [{ id }] = await authors()
+      .insert({ name: author, updated_at: new Date() })
+      .onConflict(["name"])
+      .merge()
+      .returning("id");
+    return id;
+  } catch (error) {
+    console.log(error);
     if (error.code == "23505") throw new BadRequest(error.message);
     throw new Error(error.message);
   }
-  return authorData?.id;
 };
 
 const upsertCategory = async (category: string) => {
-  const { data: categoryData, error } = await supabase
-    .from("categories")
-    .upsert({ name: category }, { onConflict: "name" })
-    .select("id")
-    .maybeSingle();
-  if (error) {
+  try {
+    const [{ id }] = await categories()
+      .insert({ name: category, updated_at: new Date() })
+      .onConflict(["name"])
+      .merge()
+      .returning("id");
+    return id;
+  } catch (error) {
+    console.log(error);
     if (error.code == "23505") throw new BadRequest(error.message);
     throw new Error(error.message);
   }
-
-  return categoryData?.id;
 };
 
 export const handleAddBook = async (
@@ -48,45 +45,43 @@ export const handleAddBook = async (
     description,
     all_copies,
     copies_in_stock = all_copies,
-    regular_price,
+    borrow_fees,
     deposit,
     author,
     category,
     publish_year,
-  }: bodyType,
+  }: addBookBody,
   picture: string | null,
   cloudinary_public_id: string | null
 ) => {
-  const [author_id, category_id] = await Promise.all([
-    upsertAuthor(author),
-    upsertCategory(category),
-  ]);
-  /* Add Book */
-  const { data: book_id, error } = await supabase
-    .from("books")
-    .insert([
+  try {
+    const [author_id, category_id] = await Promise.all([
+      upsertAuthor(author),
+      upsertCategory(category),
+    ]);
+    /* Add Book */
+    const [book] = await books().insert(
       {
         title,
         description,
-        author_id: author_id,
-        category_id: category_id,
+        author_id,
+        category_id,
         all_copies,
         copies_in_stock,
-        regular_price,
+        borrow_fees,
         deposit,
         picture,
         cloudinary_public_id,
         publish_year,
       },
-    ])
-    .select("id")
-    .single();
-
-  if (error) {
-    if (error.code == "23505") throw new BadRequest(error.message);
+      "*"
+    );
+    return book;
+  } catch (error) {
+    if (error.code == "23505")
+      throw new BadRequest("Book title already exists");
     throw new Error(error.message);
   }
-  return book_id;
 };
 
 export const handleUpdateBook = async (
@@ -97,26 +92,17 @@ export const handleUpdateBook = async (
   if (req.file) {
     await handleDeletePicture(oldPicurePublicId);
     const picture = await handleUploadPicture(req);
-
-    const { data, error } = await supabase
-      .from("books")
-      .update({ ...req.body, ...picture })
-      .eq("id", book_id)
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-
-    return data;
+    const [book] = await books()
+      .update({ ...req.body, ...picture, updated_at: new Date() })
+      .where({ id: book_id })
+      .returning("*");
+    return book;
   } else {
-    const { data, error } = await supabase
-      .from("books")
-      .update(req.body)
-      .eq("id", book_id)
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-
-    return data;
+    const [book] = await books()
+      .update({ ...req.body, updated_at: new Date() })
+      .where({ id: book_id })
+      .returning("*");
+    return book;
   }
 };
 
@@ -125,14 +111,11 @@ export const handleUpdateBookAuthor = async (
   author: string
 ) => {
   const author_id = await upsertAuthor(author);
-  const { data, error } = await supabase
-    .from("books")
-    .update({ author_id })
-    .eq("id", book_id)
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return data;
+  const [book] = await books()
+    .update({ author_id, updated_at: new Date() })
+    .where({ id: book_id })
+    .returning("*");
+  return book;
 };
 
 export const handleUpdateBookCategory = async (
@@ -140,28 +123,22 @@ export const handleUpdateBookCategory = async (
   category: string
 ) => {
   const category_id = await upsertCategory(category);
-  const { data, error } = await supabase
-    .from("books")
-    .update({ category_id })
-    .eq("id", book_id)
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return data;
+  const [book] = await books()
+    .update({ category_id, updated_at: new Date() })
+    .where({ id: book_id })
+    .returning("*");
+  return book;
 };
 
 export const handleUpdateSettings = async (req: Request) => {
-  const { data, error } = await supabase
-    .from("settings")
-    .update(req.body)
-    .eq("id", 1)
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
+  const [data] = await settings()
+    .insert({ id: 1, ...req.body, updated_at: new Date() })
+    .onConflict(["id"])
+    .merge()
+    .returning("*");
   return data;
 };
 
 export const handleDeleteBook = async (book_id: number) => {
-  const { error } = await supabase.from("books").delete().eq("id", book_id);
-  if (error) throw new Error(error.message);
+  await books().delete().where({ id: book_id });
 };

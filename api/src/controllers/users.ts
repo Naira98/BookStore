@@ -1,252 +1,157 @@
-import { NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
-import { differenceInDays, isPast } from "date-fns";
-import Stripe from "stripe";
+import { asyncHandler } from "../middlewares/asyncHandler";
+import {
+  addCartApi,
+  addRemoveWishlistApi,
+  findBooksByTitle,
+  findBooksByCategoryApi,
+  findBooksByAuthorApi,
+  findLatestBooksApi,
+  getSettingsApi,
+  getNotificationsApi,
+  addSessionIdApi,
+  handleStripeSessions,
+  borrowRequest,
+  removeCartApi,
+  returnRequest,
+  getHistoryApi,
+  getCartApi,
+  getWishlistApi,
+} from "../services/users";
+import { BadRequest } from "../lib/error";
+import { stripe } from "../lib/stripe";
 
-import Book from "../models/Book";
-import Borrow, { IBorrowModel } from "../models/Borrow";
-import User from "../models/User";
-import config from "../config/config";
+export const getLatestBooks = asyncHandler(async (req, res) => {
+  const books = await findLatestBooksApi();
+  return res.status(200).json(books);
+});
 
-const stripe = new Stripe(config.stripe.secret);
+export const findByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.params;
+  if (!category) throw new BadRequest("No Category provided");
+  const books = await findBooksByCategoryApi(category);
+  return res.status(200).json(books);
+});
 
-export const findAll = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const books = await Book.find();
-    return res.status(200).json(books);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-export const findBook = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    let { bookId } = req.params;
+export const findByAuthor = asyncHandler(async (req, res) => {
+  const { author } = req.params;
+  if (!author) throw new BadRequest("No Author provided");
+  const books = await findBooksByAuthorApi(author);
+  return res.status(200).json(books);
+});
 
-    const book = await Book.findById(bookId);
-    if (!book) return res.status(404).json({ message: "Book not found" });
+export const addRemoveWishlist = asyncHandler(async (req, res) => {
+  const { book_id } = req.body;
+  if (!book_id || !req.user?.userId) throw new BadRequest();
+  const returnData = await addRemoveWishlistApi(req.user.userId, book_id);
+  return res.status(200).json(returnData);
+});
 
-    return res.status(200).json(book);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const addCart = asyncHandler(async (req, res) => {
+  const { book_id } = req.body;
+  if (!book_id || !req.user?.userId)
+    throw new BadRequest("No book_id or user_id provided");
+  const returnData = await addCartApi(req.user.userId, book_id);
+  return res.status(200).json(returnData);
+});
 
-export const getHistory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const history = await Borrow.find({ user: req.user?.userId })
-      .populate("book")
-      .sort("-createdAt");
-    return res.status(200).json(history);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const removeCart = asyncHandler(async (req, res) => {
+  const { book_id } = req.body;
+  if (!book_id || !req.user?.userId)
+    throw new BadRequest("No book_id or user_id provided");
+  const returnData = await removeCartApi(req.user.userId, book_id);
+  return res.status(200).json(returnData);
+});
 
-export const borrowBook = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    /* Transaction */
-    const session = await mongoose.startSession();
-    await session.withTransaction(async () => {
-      const { bookId } = req.params;
-      const book = await Book.findById(bookId).session(session);
-      if (!book) return res.status(404).json({ message: "Book not found" });
+export const searchBooks = asyncHandler(async (req, res) => {
+  let { bookTitle } = req.params;
+  const book = await findBooksByTitle(bookTitle);
+  return res.status(200).json(book);
+});
 
-      // check book availablitiy
-      if (book.availableCopies <= 0)
-        return res
-          .status(400)
-          .json({ message: `Sorry, ${book.title} book unavailable now!` });
+export const getCart = asyncHandler(async (req, res) => {
+  const cart = await getCartApi(req.user?.userId!);
+  return res.status(200).json(cart);
+});
 
-      const user = await User.findById(req.user?.userId).session(session);
-      if (!user) return res.status(404).json({ message: "Book not found" });
+export const getWishlist = asyncHandler(async (req, res) => {
+  const cart = await getWishlistApi(req.user?.userId!);
+  return res.status(200).json(cart);
+});
 
-      // check user wallet
-      const bookPrice = book.regularPrice + book.deposit;
+export const getHistory = asyncHandler(async (req, res) => {
+  const history = await getHistoryApi(req.user?.userId!);
+  return res.status(200).json(history);
+});
 
-      if (user.wallet < bookPrice)
-        return res.status(400).json({
-          message: `You need ${bookPrice}$ to borrow ${book.title} book`,
-        });
+export const borrowBook = asyncHandler(async (req, res) => {
+  const { userId } = req.user!;
+  const { payment_method, borrow_method, address } = req.body;
+  const borrow = await borrowRequest(
+    userId,
+    payment_method,
+    borrow_method,
+    address
+  );
+  return res.status(201).json(borrow);
+});
+export const returnBook = asyncHandler(async (req, res) => {
+  const { borrow_book_ids, return_method, address } = req.body;
+  const returnId = await returnRequest(
+    borrow_book_ids,
+    req.user?.userId!,
+    return_method,
+    address
+  );
+  return res.status(201).json({ return_request_id: returnId });
+});
 
-      // New borrow
-      const newBorrow = new Borrow({
-        book: book._id,
-        user: user._id,
-        regularPrice: book.regularPrice,
-        deposit: book.deposit,
-        status: "borrowed",
-      });
+export const createCheckoutSession = asyncHandler(async (req, res) => {
+  const { price } = req.params;
+  const { callback_frontend_url } = req.body;
 
-      // Pay money
-      user.wallet = user.wallet - bookPrice;
-
-      // Decrease available books
-      book.availableCopies = book.availableCopies - 1;
-
-      const [addedBorrow] = await Promise.all([
-        await newBorrow.save({ session }),
-        await user.save({ session }),
-        await book.save({ session }),
-      ]);
-
-      return res.status(201).json(addedBorrow);
-    });
-    session.endSession();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-export const returnBook = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    /* Transaction */
-    const session = await mongoose.startSession();
-    await session.withTransaction(async () => {
-      const { borrowId } = req.params;
-      const borrow = await Borrow.findById(borrowId).session(session);
-      if (!borrow)
-        return res.status(404).json({ message: "Borrow Data not found" });
-
-      if (borrow.status !== "borrowed")
-        return res.status(400).json({ message: "Book not borrowed" });
-
-      if (borrow.user.toString() !== req.user?.userId)
-        return res.status(403).json({ message: "Unauthorized" });
-
-      // Get user Data
-      const user = await User.findById(borrow.user).session(session);
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      // Calculate delay days
-      const isDelay = isPast(borrow.returnDate);
-      let delayPrice = 0;
-      let fullPrice = borrow.deposit;
-
-      if (isDelay) {
-        const delayDays = differenceInDays(Date.now(), borrow.returnDate);
-        delayPrice = delayDays * ((borrow.regularPrice * 10) / 100);
-
-        fullPrice = borrow.deposit - delayPrice;
-
-        if (fullPrice < 0 && user.wallet < Math.abs(fullPrice))
-          return res.status(412).json({ message: "Insufficient funds" });
-      }
-
-      // Return money
-      user.wallet = user.wallet + fullPrice;
-
-      // Increase availableBooks
-      await Book.findByIdAndUpdate(
-        borrow.book,
-        { $inc: { availableCopies: 1 } },
-        { session }
-      );
-
-      // Update borrow data
-      borrow.status = "returned";
-
-      const [returnedBook] = await Promise.all([
-        await borrow.save({ session }),
-        await user.save({ session }),
-      ]);
-      return res.status(200).json(returnedBook);
-    });
-    session.endSession();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-
-export const createCheckoutSession = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { price } = req.params;
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            unit_amount: Number(price) * 100,
-            product_data: {
-              name: "Payment to The Bookshelf wallet",
-              description: `Adding $${price} to your Bookshelf wallet`,
-            },
+  const host = req.headers.host;
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          unit_amount: Number(price) * 100,
+          product_data: {
+            name: "Payment to The Bookshelf wallet",
+            description: `Adding $${price} to your Bookshelf wallet`,
           },
-          quantity: 1,
         },
-      ],
-      mode: "payment",
-      success_url: `http://localhost:3000/api/users/addMoney/${req.user?.userId}?amount=${price}&success=true`,
-      cancel_url: `http://localhost:3000/api/users/addMoney/0?success=false`,
-    });
-    console.log(session.url);
-    if (session.url) {
-      res.writeHead(302, {
-        Location: session.url,
-      });
-      res.end();
-      // res.redirect(303, session.url);
-    } else {
-      throw new Error("Can't create stripe session");
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `http://${host}/api/users/addMoney/${req.user?.userId}?amount=${price}&success=true&front_end_url=${callback_frontend_url}`,
+    cancel_url: `http://${host}/api/users/addMoney/0?success=false&front_end_url=${callback_frontend_url}`,
+  });
 
-export const addMoney = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { amount, success } = req.query as {
-      amount: string;
-      success: string;
-    };
-    const { userId } = req.params;
-    // console.log(userId, amount, success);
+  // TODO: add to DB the session.id
+  if (!session.url) throw new Error("Can't create stripe session");
+  await addSessionIdApi(req.user?.userId!, session.id);
 
-    if (success === "false") throw new Error("Transfer Failed");
+  return res.status(200).json(session.url);
+});
 
-    const user = await User.findById(userId);
-    if (!user) throw new Error("Error in server. Please Contact Us");
+export const addMoney = asyncHandler(async (req, res) => {
+  const { success, front_end_url } = req.query as {
+    success: "true" | "false";
+    front_end_url: string;
+  };
+  const { userId } = req.params;
+  if (success == "true") await handleStripeSessions(+userId);
+  res.redirect(front_end_url);
+});
 
-    user.wallet = user.wallet + parseInt(amount);
-    const updatedUser = await user.save();
-    res.redirect("http://localhost:5173/wallet");
-    // res.status(200).json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+export const getNotifications = asyncHandler(async (req, res) => {
+  const data = await getNotificationsApi(req.user?.userId!);
+  return res.status(200).json(data);
+});
+
+export const getSettings = asyncHandler(async (req, res) => {
+  const data = await getSettingsApi();
+  return res.status(200).json(data);
+});

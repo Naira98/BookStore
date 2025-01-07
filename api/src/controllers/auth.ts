@@ -1,9 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
 import config from "../config/config";
-import { UserPayload } from "../schemas/userSchemas";
+import { generateAccessToken, generateRefreshToken } from "../lib/helpers";
 import { handleUploadPicture } from "../config/cloudinary";
+import { BadRequest, NotFound, Unauthorized } from "../lib/error";
+import { asyncHandler } from "../middlewares/asyncHandler";
+import parsePhoneNumber from "libphonenumber-js";
 import {
   deleteRefreshToken,
   findRefreshToken,
@@ -12,9 +14,8 @@ import {
   register,
   upsertRefreshToken,
 } from "../services/auth";
-import { BadRequest, NotFound, Unauthorized } from "../lib/error";
-import { asyncHandler } from "../middlewares/asyncHandler";
-import parsePhoneNumber from "libphonenumber-js";
+import { IUser } from "../types/db_types";
+import { UserPayload } from "../schemas/userSchemas";
 
 export const postRegister = asyncHandler(async (req, res) => {
   const { full_name, email, password, phone } = req.body;
@@ -41,15 +42,13 @@ export const postRegister = asyncHandler(async (req, res) => {
 
 export const postLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
-  type User = Exclude<Awaited<ReturnType<typeof findUserBy>>, null>;
   const user:
-    | (Omit<User, "password"> & { password?: User["password"] })
+    | (Omit<IUser, "password"> & { password?: IUser["password"] })
     | null = await findUserBy("email", email);
   if (!user) throw new BadRequest("Bad Credentials");
 
   const doMatch = await bcrypt.compare(password, user.password!);
-  if (!doMatch) throw new BadRequest("Bad Credentialssss");
+  if (!doMatch) throw new BadRequest("Bad Credentials");
 
   if (user.password) delete user.password;
 
@@ -68,13 +67,12 @@ export const postLogin = asyncHandler(async (req, res) => {
 });
 
 export const refreshToken = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.body;
-
-  const tokenInDB = await findRefreshToken(refreshToken);
+  const { refresh_token } = req.body;
+  const tokenInDB = await findRefreshToken(refresh_token);
   if (!tokenInDB) throw new Unauthorized("Invalid Token");
 
   const user = jwt.verify(
-    refreshToken,
+    refresh_token,
     config.jwt.refreshSecret
   ) as UserPayload;
 
@@ -82,32 +80,26 @@ export const refreshToken = asyncHandler(async (req, res) => {
     userId: user.userId,
     role: user.role,
   });
-
   return res.status(200).json({ accessToken: newAccessToken });
 });
 
 export const getUser = asyncHandler(async (req, res) => {
-  type User = Exclude<Awaited<ReturnType<typeof findUserBy>>, null>;
-
   const user:
-    | (Omit<User, "password"> & { password?: User["password"] })
+    | (Omit<IUser, "password"> & { password?: IUser["password"] })
     | null = await findUserBy("id", req.user?.userId!);
   if (!user) return res.status(404).json({ message: "User not found" });
 
   delete user.password;
 
-  return res.status(200).json({ user });
+  return res.status(200).json(user);
 });
 
 export const updateAccount = asyncHandler(async (req, res) => {
-  type UpdatedUser = Exclude<
-    Awaited<ReturnType<typeof handleUpdateUser>>,
-    null
-  >;
   const user = await findUserBy("id", req.user?.userId!);
   if (!user) throw new NotFound("User not found");
-  const updatedUser: Omit<UpdatedUser, "password"> & {
-    password?: UpdatedUser["password"] | null;
+
+  const updatedUser: Omit<IUser, "password"> & {
+    password?: IUser["password"] | null;
   } = await handleUpdateUser(req, user.cloudinary_public_id);
   delete updatedUser.password;
   return res.status(200).json(updatedUser);

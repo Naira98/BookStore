@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export const addBookSchema = z.object({
   title: z
@@ -8,7 +8,7 @@ export const addBookSchema = z.object({
 
   all_copies: z.string(),
   copies_in_stock: z.string().optional(),
-  regular_price: z.string(),
+  borrow_fees: z.string(),
   deposit: z.string(),
   description: z
     .string({ message: "Description must be a string" })

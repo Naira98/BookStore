@@ -1,43 +1,41 @@
-import path from "path";
 import express from "express";
-// import mongoose from "mongoose";
 import cors from "cors";
 import config from "./config/config";
 import authRoutes from "./routes/auth";
+import { ERoleType } from "./types/db_types";
 import adminRoutes from "./routes/admins";
 import userRoutes from "./routes/users";
 import { errorHandler } from "./controllers/errorHandler";
 import { notFound } from "./controllers/notFound";
-import { Database } from "./services/supabase";
+import { validateData } from "./middlewares/validations";
+import { z } from "zod";
+import { headersSchema } from "./schemas/headersSchemas";
 
 export const app = express();
 
-export const IMAGES_PATH = path.join(__dirname, "..", "public", "assets");
-
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use("/assets", express.static(IMAGES_PATH));
 app.use(cors());
 
 declare module "express" {
   interface Request {
     user?: {
       userId: number;
-      role: Database["public"]["Enums"]["role_type"];
+      role: ERoleType;
     };
   }
 }
 
+if (process.env.NODE_ENV !== "test") {
+  app.use(validateData(headersSchema, "headers"));
+}
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admins", adminRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
-
-// mongoose
-//   .connect(config.mongo.url, { retryWrites: true, w: "majority" })
-//   .then(() => console.info("Connected to MongoDB"))
-//   .catch((err) => console.log(err));
 
 export const server = app.listen(config.server.port, () => {
   console.log(`Server running on port ${config.server.port}`);

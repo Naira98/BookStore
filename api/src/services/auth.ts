@@ -1,8 +1,9 @@
 import { Request } from "express";
-import supabase from "./db";
 import { handleDeletePicture, handleUploadPicture } from "../config/cloudinary";
 import { Conflict, Unauthorized } from "../lib/error";
-import { Database } from "./supabase";
+import { ERoleType } from "../types/db_types";
+import { tokens, users } from "./db";
+import { Knex } from "knex";
 
 export const register = async (
   full_name: string,
@@ -11,12 +12,11 @@ export const register = async (
   phone: string,
   picture: string | null,
   cloudinary_public_id: string | null,
-  role: Database["public"]["Enums"]["role_type"] = "user"
+  role: ERoleType = "user"
 ) => {
-  const { data, error } = await supabase
-    .from("users")
-    .insert([
-      {
+  try {
+    const [data] = await users()
+      .insert({
         full_name,
         email,
         password,
@@ -24,30 +24,40 @@ export const register = async (
         picture,
         cloudinary_public_id,
         role,
-        wallet: 0,
-      },
-    ])
-    .select("id, role")
-    .single();
-
-  if (error) {
+      })
+      .returning(["id", "role"]);
+    return { id: data.id, role: data.role };
+  } catch (error) {
     if (error.code == "23505") throw new Conflict("Email already exists");
     throw new Error(error.message);
   }
-  return data;
 };
 
-export const findUserBy = async (findBy: string, value: string | number) => {
-  let { data: user, error } = await supabase
-    .from("users")
-    .select()
-    .eq(findBy, value)
-    .maybeSingle();
+export const findUserBy = async (
+  findBy: string,
+  value: string | number,
+  trx?: Knex.Transaction
+) => {
+  let query = users().select("*").where(findBy, "=", value);
+  if (trx) query.transacting(trx);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  const [user] = await query;
   return user;
+};
+
+export const upsertRefreshToken = async (
+  user_id: number,
+  refresh_token: string
+) => {
+  await tokens()
+    .insert({ user_id, refresh_token, updated_at: new Date() })
+    .onConflict(["user_id"])
+    .merge();
+};
+
+export const findRefreshToken = async (refresh_token: string) => {
+  const [token] = await tokens().select("*").where({ refresh_token });
+  return token;
 };
 
 export const handleUpdateUser = async (
@@ -58,73 +68,27 @@ export const handleUpdateUser = async (
     if (req.file) {
       await handleDeletePicture(oldPicurePublicId);
       const picture = await handleUploadPicture(req);
-      const { data, error } = await supabase
-        .from("users")
-        .update({ ...req.body, ...picture })
-        .eq("id", req.user.userId)
-        .select()
-        .single();
-      if (error) {
-        throw new Error(error.message);
-      }
-      return data;
+      const [user] = await users()
+        .update({ ...req.body, ...picture, updated_at: new Date() })
+        .where({ id: req.user.userId })
+        .returning("*");
+      return user;
     } else {
-      const { data, error } = await supabase
-        .from("users")
-        .update(req.body)
-        .eq("id", req.user.userId)
-        .select()
-        .single();
-      if (error) {
-        throw new Error(error.message);
-      }
-      return data;
+      const [user] = await users()
+        .update({ ...req.body, updated_at: new Date() })
+        .where({ id: req.user.userId })
+        .returning("*");
+      return user;
     }
   } else {
     throw new Unauthorized("You are not authenticated");
   }
 };
 
-export const upsertRefreshToken = async (
-  user_id: number,
-  refresh_token: string
-) => {
-  const { data, error } = await supabase
-    .from("tokens")
-    .upsert({ user_id, refresh_token });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-};
-
-export const findRefreshToken = async (refresh_token: string) => {
-  const { data, error } = await supabase
-    .from("tokens")
-    .select()
-    .eq("refresh_token", refresh_token)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
-};
-
 export const deleteRefreshToken = async (user_id: number) => {
-  const { error } = await supabase
-    .from("tokens")
-    .delete()
-    .eq("user_id", user_id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await tokens().where({ user_id }).del();
 };
 
 export const deleteUsers = async (id: number) => {
-  const { error } = await supabase.from("users").delete().eq("id", id);
-  if (error) {
-    throw new Error(error.message);
-  }
+  await users().where({ id }).del();
 };

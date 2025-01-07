@@ -4,13 +4,6 @@ dotenv.config();
 
 const development = process.env.NODE_ENV === "development";
 
-const MONGO_USER = process.env.MONGO_USER || "";
-const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
-const MONGO_URL = `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.xk4dvlj.mongodb.net/BookStore`;
-
-const SUPABASE_URL = process.env.SUPABASE_URL || "";
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
-
 const SERVER_PORT = process.env.SERVER_PORT
   ? Number(process.env.SERVER_PORT)
   : 1337;
@@ -24,10 +17,13 @@ const CLOUDINAY_API_NAME = process.env.CLOUDINAY_API_NAME || "";
 const CLOUDINAY_API_KEY = process.env.CLOUDINAY_API_KEY || "";
 const CLOUDINAY_API_SECRET = process.env.CLOUDINAY_API_SECRET || "";
 
+const PG_user = process.env.PG_user || "";
+const PG_password = process.env.PG_password || "";
+const PG_host = process.env.PG_host || "";
+const PG_port = process.env.PG_port || 5432;
+const PG_database = process.env.PG_database || "";
+
 const config = {
-  mongo: {
-    url: MONGO_URL,
-  },
   server: {
     port: SERVER_PORT,
     dev: development,
@@ -39,15 +35,18 @@ const config = {
   stripe: {
     secret: STRIPE_SECRET_KEY,
   },
-  supabase: {
-    url: SUPABASE_URL,
-    service_key: SUPABASE_SERVICE_KEY
-  },
   cloudinay: {
     cloud_name: CLOUDINAY_API_NAME,
     api_key: CLOUDINAY_API_KEY,
-    api_secret: CLOUDINAY_API_SECRET
-  }
+    api_secret: CLOUDINAY_API_SECRET,
+  },
+  postgres: {
+    user: PG_user,
+    password: PG_password,
+    host: PG_host,
+    port: PG_port,
+    database: PG_database,
+  },
 };
 
 export default config;

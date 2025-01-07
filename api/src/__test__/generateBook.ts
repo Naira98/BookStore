@@ -13,7 +13,7 @@ export function generateBookData() {
     deposit: faker.number
       .float({ min: 5, max: 100, fractionDigits: 2 })
       .toString(),
-    regular_price: faker.number
+    borrow_fees: faker.number
       .float({ min: 5, max: 100, fractionDigits: 2 })
       .toString(),
     publish_year: faker.number.int({ min: 1950, max: 2025 }).toString(),
